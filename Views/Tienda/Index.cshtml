@@ -1,0 +1,83 @@
+@model List<OllinBarberApp.Models.Producto>
+
+<style>
+    .store-shell {
+        width: min(1120px, calc(100% - 24px));
+        margin: 32px auto 60px;
+    }
+
+    .store-title {
+        color: #d4af37;
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 20px;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .product-card {
+        background: #111;
+        border: 1px solid rgba(212, 175, 55, .45);
+        border-radius: 8px;
+        overflow: hidden;
+        min-height: 100%;
+    }
+
+    .product-card img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        background: #191919;
+    }
+
+    .product-body {
+        padding: 16px;
+    }
+
+    .product-category {
+        color: #f1dfaa;
+        font-size: .85rem;
+        text-transform: uppercase;
+    }
+
+    .product-price {
+        color: #d4af37;
+        font-weight: 800;
+        font-size: 1.35rem;
+    }
+</style>
+
+<section class="store-shell">
+    <h1 class="store-title">Tienda Ollin Barber</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-dark border-warning text-warning">
+            No hay productos activos disponibles.
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
+            @foreach (var producto in Model)
+            {
+                var imagen = string.IsNullOrWhiteSpace(producto.ImagenUrl)
+                    ? "/images/logo.png"
+                    : producto.ImagenUrl;
+
+                <article class="product-card">
+                    <img src="@imagen" alt="@producto.Nombre" />
+                    <div class="product-body">
+                        <div class="product-category">@producto.Categoria</div>
+                        <h2 class="h5">@producto.Nombre</h2>
+                        <p class="text-white-50">@producto.Descripcion</p>
+                        <div class="product-price">@producto.Precio.ToString("C0")</div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

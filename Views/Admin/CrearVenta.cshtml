@@ -1,0 +1,312 @@
+﻿@model OllinBarberApp.Models.VentaViewModel
+
+@{
+    ViewData["Title"] = "Crear Venta";
+}
+
+<div class="container py-5">
+
+    <div class="mb-5">
+
+        <h1 class="titulo-premium">
+            Nueva Venta
+        </h1>
+
+        <p class="subtitulo-premium">
+            Sistema premium de ventas Ollin Barber
+        </p>
+
+    </div>
+
+    <form method="post"
+          asp-action="CrearVenta">
+
+        <div class="row g-4">
+
+            <!-- CLIENTE -->
+
+            <div class="col-lg-4">
+
+                <div class="card-premium p-4 h-100">
+
+                    <h4 class="mb-4 text-gold">
+                        Cliente
+                    </h4>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Nombre del cliente
+                        </label>
+
+                        <input asp-for="ClienteNombre"
+                               class="form-control input-premium"
+                               placeholder="Ej: Juan David" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PRODUCTOS -->
+
+            <div class="col-lg-8">
+
+                <div class="card-premium p-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <h4 class="text-gold m-0">
+                            Productos
+                        </h4>
+
+                        <button type="button"
+                                class="btn btn-gold"
+                                onclick="agregarProducto()">
+
+                            Agregar Producto
+
+                        </button>
+
+                    </div>
+
+                    <div id="productosContainer">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TOTAL -->
+
+        <div class="card-premium p-4 mt-4">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+
+                    <h3 class="text-gold mb-1">
+                        Total
+                    </h3>
+
+                    <h1 id="totalVenta"
+                        class="fw-bold">
+                        $ 0
+                    </h1>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success btn-lg px-5">
+
+                    Registrar Venta
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- TEMPLATE -->
+
+<template id="productoTemplate">
+
+    <div class="producto-item mb-4">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Producto
+                </label>
+
+                <select name="ProductosIds"
+                        class="form-select input-premium producto-select"
+                        onchange="actualizarTotal()">
+
+                    <option value="">
+                        Selecciona producto
+                    </option>
+
+                    @foreach (var producto in Model.ProductosDisponibles)
+                    {
+                        <option value="@producto.Id"
+                                data-precio="@producto.Precio">
+
+                            @producto.Nombre
+                            -
+                            $ @producto.Precio.ToString("N0")
+
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <label class="form-label">
+                    Cantidad
+                </label>
+
+                <input type="number"
+                       name="Cantidades"
+                       class="form-control input-premium cantidad-input"
+                       value="1"
+                       min="1"
+                       onchange="actualizarTotal()" />
+
+            </div>
+
+            <div class="col-md-3">
+
+                <button type="button"
+                        class="btn btn-danger w-100"
+                        onclick="eliminarProducto(this)">
+
+                    Eliminar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+
+<style>
+
+    .titulo-premium {
+        font-size: 2.7rem;
+        font-weight: 700;
+        color: #C8A96B;
+    }
+
+    .subtitulo-premium {
+        color: rgba(255,255,255,.7);
+    }
+
+    .text-gold {
+        color: #C8A96B;
+    }
+
+    .card-premium {
+        background: rgba(18,18,18,.96);
+        border: 1px solid rgba(200,169,107,.15);
+        border-radius: 24px;
+        box-shadow: 0 20px 45px rgba(0,0,0,.35);
+    }
+
+    .input-premium {
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(200,169,107,.12);
+        color: white !important;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+        .input-premium:focus {
+            border-color: #C8A96B;
+            box-shadow: 0 0 0 0.2rem rgba(200,169,107,.15);
+            background: rgba(255,255,255,.05);
+        }
+
+    .form-label {
+        color: rgba(255,255,255,.8);
+        font-weight: 500;
+    }
+
+    .btn-gold {
+        background: linear-gradient(135deg,#C8A96B,#d4af37);
+        color: black;
+        border: none;
+        font-weight: 700;
+        border-radius: 14px;
+        padding: 12px 22px;
+    }
+
+        .btn-gold:hover {
+            color: black;
+            transform: translateY(-2px);
+        }
+
+    select option {
+        background: #121212;
+        color: white;
+    }
+
+</style>
+
+@section Scripts {
+
+    <script>
+
+        agregarProducto();
+
+        function agregarProducto() {
+
+            const template =
+                document.getElementById("productoTemplate");
+
+            const clone =
+                template.content.cloneNode(true);
+
+            document
+                .getElementById("productosContainer")
+                .appendChild(clone);
+
+            actualizarTotal();
+        }
+
+        function eliminarProducto(btn) {
+
+            btn.closest(".producto-item").remove();
+
+            actualizarTotal();
+        }
+
+        function actualizarTotal() {
+
+            let total = 0;
+
+            const items =
+                document.querySelectorAll(".producto-item");
+
+            items.forEach(item => {
+
+                const select =
+                    item.querySelector(".producto-select");
+
+                const cantidadInput =
+                    item.querySelector(".cantidad-input");
+
+                const precio =
+                    parseFloat(
+                        select.selectedOptions[0]
+                        ?.dataset.precio || 0);
+
+                const cantidad =
+                    parseInt(cantidadInput.value || 0);
+
+                total += precio * cantidad;
+            });
+
+            document.getElementById("totalVenta")
+                .innerText =
+                "$ " + total.toLocaleString();
+        }
+
+    </script>
+
+}

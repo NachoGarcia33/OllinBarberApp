@@ -1,0 +1,27 @@
+@model OllinBarberApp.Models.ConfiguracionSistema
+
+<section class="container py-4" style="max-width:760px;">
+    <h1 class="mb-3" style="color:#d4af37;">Configuración del sistema</h1>
+
+    <form method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-check form-switch mb-3">
+            <input asp-for="DashboardActivo" class="form-check-input" />
+            <label class="form-check-label">Dashboard financiero activo</label>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <input asp-for="TiendaActiva" class="form-check-input" />
+            <label class="form-check-label">Tienda activa</label>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+            <input asp-for="WhatsappActivo" class="form-check-input" />
+            <label class="form-check-label">WhatsApp activo</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning fw-bold">Guardar configuración</button>
+    </form>
+</section>

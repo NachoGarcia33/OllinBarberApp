@@ -1,0 +1,191 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<style>
+
+    .hero {
+        position: relative;
+        min-height: calc(100vh - 90px);
+        background-image: linear-gradient( rgba(0,0,0,.72), rgba(0,0,0,.82) ), url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+        /* EFECTO CINEMATOGRÁFICO */
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient( circle, rgba(212,175,55,.12), transparent 70% );
+            top: -250px;
+            right: -250px;
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( to top, rgba(0,0,0,.82), rgba(0,0,0,.25), rgba(0,0,0,.72) );
+        }
+
+    .contenido {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 1100px;
+        padding: 40px 20px;
+    }
+
+    /* TITULO */
+
+    .branding h1 {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(3rem, 8vw, 7rem);
+        color: #d4af37;
+        letter-spacing: 8px;
+        margin-bottom: 18px;
+        font-weight: 700;
+        text-shadow: 0 0 30px rgba(212,175,55,.15);
+        animation: fadeLuxury 1.2s ease;
+    }
+
+    /* SUBTITULO */
+
+    .subtitulo {
+        color: rgba(255,255,255,.82);
+        font-size: clamp(1rem, 2vw, 1.4rem);
+        letter-spacing: 3px;
+        margin-bottom: 50px;
+        font-weight: 300;
+        animation: fadeLuxury 1.6s ease;
+    }
+
+    /* BOTONES */
+
+    .botones {
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        flex-wrap: wrap;
+        animation: fadeLuxury 2s ease;
+    }
+
+    .btn-barber {
+        padding: 16px 34px;
+        min-width: 220px;
+        border-radius: 18px;
+        border: 1px solid rgba(212,175,55,.35);
+        background: rgba(20,20,20,.45);
+        backdrop-filter: blur(12px);
+        color: #d4af37;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        transition: .35s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+        .btn-barber:hover {
+            transform: translateY(-6px) scale(1.03);
+            background: rgba(212,175,55,.15);
+            color: white;
+            border-color: #d4af37;
+            box-shadow: 0 18px 40px rgba(212,175,55,.15);
+        }
+
+    /* EFECTO APARICIÓN */
+
+    @@keyframes fadeLuxury {
+
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* MOBILE */
+
+    @@media(max-width:768px) {
+
+        .hero {
+            padding: 40px 20px 80px;
+        }
+
+        .branding h1 {
+            letter-spacing: 4px;
+        }
+
+        .subtitulo {
+            line-height: 1.8;
+            margin-bottom: 35px;
+        }
+
+        .btn-barber {
+            width: 100%;
+            max-width: 320px;
+        }
+    }
+
+</style>
+
+<section class="hero">
+
+    <div class="contenido">
+
+        <div class="branding">
+
+            <h1>
+                OLLIN BARBER
+            </h1>
+
+        </div>
+
+        <p class="subtitulo">
+
+            Estilo clásico • Precisión moderna • Experiencia premium
+
+        </p>
+
+        <div class="botones">
+
+            <a href="/Citas/Crear"
+               class="btn-barber">
+
+                Agendar Cita
+
+            </a>
+
+            <a href="/Citas/Agenda"
+               class="btn-barber">
+
+                Ver Agenda
+
+            </a>
+
+            <a href="/Citas/Index"
+               class="btn-barber">
+
+                Ver Citas
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>

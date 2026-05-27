@@ -1,0 +1,37 @@
+@model OllinBarberApp.Models.Servicio
+
+<section class="container py-4" style="max-width:680px;">
+    <h1 class="mb-3" style="color:#d4af37;">Editar servicio</h1>
+
+    <form method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input asp-for="Nombre" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Duración en minutos</label>
+            <input asp-for="Duracion" type="number" min="1" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input asp-for="Precio" type="number" min="0" step="100" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <input asp-for="Tipo" class="form-control" />
+        </div>
+
+        <div class="form-check mb-4">
+            <input class="form-check-input" asp-for="Activo" />
+            <label class="form-check-label">Activo</label>
+        </div>
+
+        <button class="btn btn-warning fw-bold w-100">Guardar cambios</button>
+    </form>
+</section>

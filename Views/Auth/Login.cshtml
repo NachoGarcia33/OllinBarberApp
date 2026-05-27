@@ -1,0 +1,26 @@
+﻿<h2 style="text-align:center; color:gold;">Login</h2>
+@if (TempData["Success"] != null)
+{
+    <div style="color:green; text-align:center;">
+        @TempData["Success"]
+    </div>
+}
+
+<form method="post" style="max-width:400px; margin:auto;">
+
+    <input name="email" placeholder="Correo" class="form-control" required />
+    <br />
+
+    <input name="password" type="password" placeholder="Contraseña" class="form-control" required />
+    <br />
+
+    <button type="submit" style="width:100%; background:gold; border:none; padding:10px;">
+        Ingresar
+    </button>
+
+    @if (ViewBag.Error != null)
+    {
+        <p style="color:red; text-align:center;">@ViewBag.Error</p>
+    }
+
+</form>

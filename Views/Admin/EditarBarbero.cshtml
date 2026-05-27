@@ -1,0 +1,63 @@
+@model OllinBarberApp.Models.Barbero
+
+<section class="container py-4" style="max-width:680px;">
+    <h1 class="mb-3 text-warning">Editar barbero</h1>
+
+    <form asp-action="EditarBarbero"
+          method="post"
+          enctype="multipart/form-data"
+          class="bg-dark border border-warning rounded p-4">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label text-light">Nombre</label>
+            <input asp-for="Nombre" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-light">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-light">
+                Cambiar imagen
+            </label>
+
+            <input type="file"
+                   name="ImagenArchivo"
+                   class="form-control"
+                   accept="image/*" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+        {
+            <div class="mb-3 text-center">
+                <img src="@Model.ImagenUrl"
+                     style="width:180px;height:180px;object-fit:cover;border-radius:12px;border:3px solid #d4af37;" />
+            </div>
+        }
+
+        <div class="form-check mb-2">
+            <input class="form-check-input" asp-for="Disponible" />
+            <label class="form-check-label text-light">
+                Disponible
+            </label>
+        </div>
+
+        <div class="form-check mb-4">
+            <input class="form-check-input" asp-for="Activo" />
+            <label class="form-check-label text-light">
+                Activo
+            </label>
+        </div>
+
+        <button type="submit"
+                class="btn btn-warning fw-bold w-100">
+            Guardar cambios
+        </button>
+    </form>
+</section>

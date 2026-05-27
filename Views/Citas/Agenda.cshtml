@@ -1,0 +1,225 @@
+@model (List<DateTime> horarios, List<OllinBarberApp.Models.Cita> citas)
+@using OllinBarberApp.Models
+
+@{
+    var servicios = (List<Servicio>)ViewBag.Servicios;
+    var barberos = (List<Barbero>)ViewBag.Barberos;
+    var fecha = (string)ViewBag.Fecha;
+
+    Func<Barbero, DateTime, Cita?> obtenerCita = (barbero, hora) =>
+    {
+        return Model.citas.FirstOrDefault(c =>
+        {
+            if (c.BarberoId != barbero.Id && c.Barbero != barbero.Nombre)
+            {
+                return false;
+            }
+
+            var servicio = servicios.FirstOrDefault(s => s.Id == c.ServicioId);
+
+            if (servicio == null)
+            {
+                return false;
+            }
+
+            var inicio = c.FechaHora;
+            var fin = c.FechaHora.AddMinutes(servicio.Duracion);
+
+            return hora >= inicio && hora < fin;
+        });
+    };
+
+    Func<EstadoCita, string> claseEstado = estado => estado switch
+    {
+        EstadoCita.Pendiente => "estado-pendiente",
+        EstadoCita.Atendido => "estado-atendido",
+        EstadoCita.NoAsistio => "estado-noasistio",
+        EstadoCita.Cancelada => "estado-cancelada",
+        _ => "estado-ocupado"
+    };
+
+    Func<EstadoCita, string> textoEstado = estado => estado == EstadoCita.NoAsistio
+        ? "No asistió"
+        : estado.ToString();
+}
+
+<style>
+    .agenda-shell {
+        width: min(1200px, calc(100% - 24px));
+        margin: 30px auto 60px;
+    }
+
+    .agenda-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .agenda-title {
+        color: #d4af37;
+        font-family: 'Playfair Display', serif;
+        margin: 0;
+    }
+
+    .agenda-card {
+        background: #111;
+        border: 1px solid rgba(212, 175, 55, .45);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .agenda-table {
+        min-width: 760px;
+        margin-bottom: 0;
+    }
+
+    .agenda-table th {
+        background: #070707;
+        color: #d4af37;
+        border-color: #2b2517;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .agenda-table td {
+        background: #121212;
+        color: #fff;
+        border-color: #242018;
+        text-align: center;
+        vertical-align: top;
+        min-width: 150px;
+    }
+
+    .slot-state {
+        border-radius: 8px;
+        padding: 9px;
+        min-height: 82px;
+    }
+
+    .estado-pendiente { background: #d99a19; color: #121212; }
+    .estado-atendido { background: #1d8f52; }
+    .estado-noasistio { background: #943333; }
+    .estado-cancelada { background: #555; }
+
+    .slot-free {
+        display: block;
+        color: #0d0d0d;
+        background: #d4af37;
+        text-decoration: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 800;
+    }
+
+    .slot-actions {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .slot-actions .btn {
+        padding: 4px 8px;
+        font-size: .82rem;
+    }
+
+    .empty-state {
+        border: 1px dashed #4b4329;
+        color: #f1dfaa;
+        border-radius: 8px;
+        padding: 22px;
+        text-align: center;
+        background: #111;
+    }
+</style>
+
+<section class="agenda-shell">
+    <div class="agenda-toolbar">
+        <div>
+            <h1 class="agenda-title">Agenda del día</h1>
+            <div class="text-white-50">@DateTime.Parse(fecha).ToString("dd/MM/yyyy")</div>
+        </div>
+
+        <form method="get" class="d-flex gap-2 align-items-end">
+            <div>
+                <label class="form-label text-warning mb-1">Fecha</label>
+                <input type="date" name="fecha" value="@fecha" class="form-control" />
+            </div>
+            <button class="btn btn-warning fw-bold">Ver</button>
+        </form>
+    </div>
+
+    @if (!barberos.Any())
+    {
+        <div class="empty-state">
+            No hay barberos activos para mostrar en agenda.
+        </div>
+    }
+    else
+    {
+        <div class="agenda-card table-responsive">
+            <table class="table agenda-table">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        @foreach (var barbero in barberos)
+                        {
+                            <th>@barbero.Nombre</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var hora in Model.horarios)
+                    {
+                        <tr>
+                            <td>@hora.ToString("HH:mm")</td>
+
+                            @foreach (var barbero in barberos)
+                            {
+                                var cita = obtenerCita(barbero, hora);
+
+                                <td>
+                                    @if (cita != null)
+                                    {
+                                        <div class="slot-state @claseEstado(cita.Estado)">
+                                            <strong>@cita.ClienteNombre</strong>
+                                            <div>@textoEstado(cita.Estado)</div>
+
+                                            @if (cita.Estado == EstadoCita.Pendiente)
+                                            {
+                                                <div class="slot-actions">
+                                                    <form method="post" action="/Citas/MarcarAtendido">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@cita.Id" />
+                                                        <button class="btn btn-sm btn-success">Llegó</button>
+                                                    </form>
+
+                                                    <form method="post" action="/Citas/Cancelar">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@cita.Id" />
+                                                        <button class="btn btn-sm btn-danger">Cancelar</button>
+                                                    </form>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <a class="slot-free"
+                                           href="/Citas/Crear?fechaHora=@hora.ToString("yyyy-MM-ddTHH:mm")&barberoId=@barbero.Id">
+                                            Disponible
+                                        </a>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

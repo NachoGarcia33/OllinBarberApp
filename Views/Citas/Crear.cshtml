@@ -1,0 +1,473 @@
+@model OllinBarberApp.Models.Cita
+@using OllinBarberApp.Models
+
+@{
+    var barberos = (List<Barbero>)ViewBag.Barberos;
+    var servicios = (List<Servicio>)ViewBag.Servicios;
+}
+
+<style>
+
+    .appointment-wrapper {
+        width: min(1150px, calc(100% - 30px));
+        margin: 50px auto 80px;
+    }
+
+    .appointment-header {
+        text-align: center;
+        margin-bottom: 45px;
+    }
+
+        .appointment-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.8rem);
+            color: #d4af37;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        .appointment-header p {
+            color: #d8c38a;
+            font-size: 1.05rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+    .appointment-panel {
+        background: linear-gradient(145deg, #111111, #181818);
+        border: 1px solid rgba(212,175,55,.25);
+        border-radius: 28px;
+        padding: 45px;
+        box-shadow: 0 25px 70px rgba(0,0,0,.55), 0 0 40px rgba(212,175,55,.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .appointment-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( 120deg, rgba(212,175,55,.04), transparent 40% );
+            pointer-events: none;
+        }
+
+    .section-title {
+        color: #d4af37;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 18px;
+        font-size: 1.1rem;
+    }
+
+    .form-label {
+        color: #f4deb0;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control,
+    .form-select {
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(212,175,55,.18);
+        color: white;
+        border-radius: 14px;
+        padding: 15px 18px;
+        min-height: 56px;
+        transition: .25s ease;
+    }
+
+    input[type="datetime-local"] {
+        color-scheme: dark;
+        position: relative;
+    }
+
+        /* Icono calendario */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(75%) sepia(55%) saturate(500%) hue-rotate(5deg);
+            cursor: pointer;
+            opacity: .9;
+            transition: .25s ease;
+        }
+
+            input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+
+        /* Texto interno */
+        input[type="datetime-local"]::-webkit-datetime-edit {
+            color: #f5deb3;
+            letter-spacing: 1px;
+        }
+
+        /* Fondo interno */
+        input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+            background: transparent;
+        }
+
+        /* Glow elegante */
+        input[type="datetime-local"]:focus {
+            box-shadow: 0 0 0 .2rem rgba(212,175,55,.12), 0 0 25px rgba(212,175,55,.18);
+        }
+
+        .form-select option {
+            background: #111111;
+            color: #f5deb3;
+            padding: 12px;
+        }
+
+            .form-select option:checked {
+                background: #d4af37;
+                color: #000;
+            }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,.45);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255,255,255,.05);
+            border-color: #d4af37;
+            color: white;
+            box-shadow: 0 0 0 .2rem rgba(212,175,55,.12), 0 0 20px rgba(212,175,55,.12);
+        }
+
+    .barber-title {
+        text-align: center;
+        margin: 50px 0 30px;
+        color: #d4af37;
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+    }
+
+    .barber-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    .barber-card {
+        position: relative;
+        background: linear-gradient( 145deg, #171717, #101010 );
+        border: 1px solid rgba(212,175,55,.12);
+        border-radius: 22px;
+        padding: 22px 20px;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        transition: .30s ease;
+        overflow: hidden;
+    }
+
+        .barber-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( 145deg, rgba(212,175,55,.06), transparent );
+            opacity: 0;
+            transition: .35s ease;
+        }
+
+        .barber-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(212,175,55,.6);
+            box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 0 25px rgba(212,175,55,.08);
+        }
+
+            .barber-card:hover::before {
+                opacity: 1;
+            }
+
+        .barber-card.selected {
+            border-color: #d4af37;
+            background: linear-gradient( 145deg, #201b10, #171717 );
+            box-shadow: 0 0 0 2px rgba(212,175,55,.2), 0 20px 60px rgba(0,0,0,.55);
+        }
+
+        .barber-card img {
+            width: 92px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            margin-bottom: 18px;
+            box-shadow: 0 0 20px rgba(212,175,55,.2);
+        }
+
+    .barber-name {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .barber-role {
+        color: #c5a96d;
+        font-size: .78rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .btn-appointment {
+        width: 100%;
+        max-width: 620px;
+        margin-inline: auto;
+        margin-top: 45px;
+        border: none;
+        border-radius: 18px;
+        padding: 18px;
+        background: linear-gradient( 135deg, #d4af37, #f3d27a );
+        color: black;
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        transition: .3s ease;
+        box-shadow: 0 15px 35px rgba(212,175,55,.22);
+        display: block;
+    }
+
+        .btn-appointment:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 45px rgba(212,175,55,.35);
+        }
+
+    .empty-state {
+        border: 1px dashed rgba(212,175,55,.25);
+        border-radius: 18px;
+        padding: 30px;
+        text-align: center;
+        color: #d8c38a;
+        background: rgba(255,255,255,.02);
+    }
+
+    .alert-danger {
+        border-radius: 16px;
+        background: rgba(220,53,69,.1);
+        border: 1px solid rgba(220,53,69,.3);
+        color: #ffb8c0;
+    }
+
+    @@media(max-width:768px) {
+
+        .appointment-panel {
+            padding: 28px 20px;
+            border-radius: 22px;
+        }
+
+        .barber-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-header h1 {
+            letter-spacing: 2px;
+        }
+    }
+
+</style>
+
+<section class="appointment-wrapper">
+
+    <div class="appointment-header">
+        <h1>Reserva Tu Experiencia</h1>
+
+        <p>
+            Precisión • Estilo • Atención Premium
+        </p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger mb-4">
+
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+
+        </div>
+    }
+
+    <form asp-action="Crear"
+          method="post"
+          class="appointment-panel">
+
+        @Html.AntiForgeryToken()
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Nombre del cliente
+                </label>
+
+                <input asp-for="ClienteNombre"
+                       class="form-control"
+                       placeholder="Ingresa tu nombre"
+                       required />
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Teléfono
+                </label>
+
+                <input asp-for="Telefono"
+                       class="form-control"
+                       placeholder="Número de contacto" />
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Fecha y hora
+                </label>
+
+                <input asp-for="FechaHora"
+                       type="datetime-local"
+                       class="form-control"
+                       value="@(Model.FechaHora != DateTime.MinValue ? Model.FechaHora.ToString("yyyy-MM-ddTHH:mm") : "")"
+                       required />
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Servicio
+                </label>
+
+                <select asp-for="ServicioId"
+                        class="form-select"
+                        required>
+
+                    <option value="">
+                        Selecciona un servicio
+                    </option>
+
+                    @foreach (var servicio in servicios)
+                    {
+                        <option value="@servicio.Id">
+                            @servicio.Nombre -
+                            @servicio.Duracion min -
+                            @servicio.Precio.ToString("C0")
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <h2 class="barber-title">
+            Elige Tu Barbero
+        </h2>
+
+        @if (barberos.Any())
+        {
+            <div class="barber-grid">
+
+                @foreach (var barbero in barberos)
+                {
+                    var imagen = string.IsNullOrWhiteSpace(barbero.ImagenUrl)
+                    ? "/images/logo.png"
+                    : barbero.ImagenUrl;
+
+                    <button type="button"
+                            class="barber-card @(Model.BarberoId == barbero.Id ? "selected" : "")"
+                            data-id="@barbero.Id"
+                            data-nombre="@barbero.Nombre">
+
+                        <img src="@imagen"
+                             alt="@barbero.Nombre" />
+
+                        <div class="barber-name">
+                            @barbero.Nombre
+                        </div>
+
+                        <div class="barber-role">
+                            Barber Expert
+                        </div>
+
+                    </button>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                No hay barberos disponibles actualmente.
+            </div>
+        }
+
+        <input type="hidden"
+               asp-for="BarberoId"
+               id="barberoIdSeleccionado" />
+
+        <input type="hidden"
+               asp-for="Barbero"
+               id="barberoSeleccionado" />
+
+        <button type="submit"
+                class="btn-appointment">
+
+            Confirmar Reserva
+
+        </button>
+
+    </form>
+
+</section>
+
+<script>
+
+    const barberoIdInput =
+        document.getElementById("barberoIdSeleccionado");
+
+    const barberoNombreInput =
+        document.getElementById("barberoSeleccionado");
+
+    document.querySelectorAll(".barber-card")
+        .forEach(card => {
+
+            card.addEventListener("click", () => {
+
+                document.querySelectorAll(".barber-card")
+                    .forEach(item =>
+                        item.classList.remove("selected"));
+
+                card.classList.add("selected");
+
+                barberoIdInput.value =
+                    card.dataset.id;
+
+                barberoNombreInput.value =
+                    card.dataset.nombre;
+
+            });
+
+        });
+
+    document.querySelector("form")
+        .addEventListener("submit", event => {
+
+            if (!barberoIdInput.value) {
+
+                event.preventDefault();
+
+                alert("Debes seleccionar un barbero.");
+
+            }
+
+        });
+
+</script>

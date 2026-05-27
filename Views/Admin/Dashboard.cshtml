@@ -1,0 +1,676 @@
+@model OllinBarberApp.Models.DashboardFinancieroViewModel
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+    .dashboard-shell {
+        width: min(1350px, calc(100% - 30px));
+        margin: 50px auto 90px;
+    }
+
+    /* HEADER */
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 35px;
+    }
+
+    .dashboard-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.5rem, 5vw, 4.2rem);
+        color: #d4af37;
+        margin: 0;
+        letter-spacing: 2px;
+    }
+
+    .dashboard-subtitle {
+        color: #c9a96b;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: .9rem;
+        margin-top: 8px;
+    }
+
+    /* TOOLBAR */
+
+    .toolbar {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+        .toolbar .btn {
+            border-radius: 14px;
+            padding: 12px 22px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            transition: .3s ease;
+        }
+
+            .toolbar .btn:hover {
+                transform: translateY(-3px);
+            }
+
+    .btn-gold {
+        background: linear-gradient(135deg,#d4af37,#f3d27a);
+        border: none;
+        color: black;
+        box-shadow: 0 15px 35px rgba(212,175,55,.25);
+    }
+
+    .btn-outline-premium {
+        border: 1px solid rgba(212,175,55,.35);
+        color: #d4af37;
+        background: rgba(255,255,255,.02);
+    }
+
+        .btn-outline-premium:hover {
+            background: rgba(212,175,55,.1);
+            color: white;
+            border-color: #d4af37;
+        }
+
+    /* MÉTRICAS */
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: 22px;
+        margin-bottom: 35px;
+    }
+
+    .metric {
+        position: relative;
+        overflow: hidden;
+        min-width: 0;
+        padding: 30px;
+        border-radius: 28px;
+        background: linear-gradient(145deg,#171717,#101010);
+        border: 1px solid rgba(212,175,55,.14);
+        box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 0 30px rgba(212,175,55,.04);
+        transition: .35s ease;
+    }
+
+        .metric::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( 145deg, rgba(212,175,55,.08), transparent );
+            opacity: .9;
+        }
+
+        .metric::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: rgba(212,175,55,.06);
+            border-radius: 50%;
+            top: -70px;
+            right: -70px;
+            filter: blur(30px);
+        }
+
+        .metric:hover {
+            transform: translateY(-6px);
+            border-color: rgba(212,175,55,.35);
+            box-shadow: 0 30px 70px rgba(0,0,0,.55), 0 0 35px rgba(212,175,55,.08);
+        }
+
+        .metric span {
+            position: relative;
+            z-index: 2;
+            display: block;
+            color: #c9a96b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: .85rem;
+            margin-bottom: 14px;
+        }
+
+        .metric b {
+            position: relative;
+            z-index: 2;
+            display: block;
+            color: white;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+    .money-value {
+        font-size: clamp(1.8rem, 3vw, 3rem);
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    /* PANELS */
+
+    .panel {
+        background: linear-gradient(145deg,#171717,#101010);
+        border: 1px solid rgba(212,175,55,.12);
+        border-radius: 30px;
+        padding: 28px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 0 25px rgba(212,175,55,.04);
+        height: 100%;
+    }
+
+    .panel-title {
+        color: #d4af37;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* CHART */
+
+    .chart-container {
+        position: relative;
+        height: 340px;
+    }
+
+    /* PROGRESS */
+
+    .progress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .progress-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        color: white;
+        font-weight: 600;
+        gap: 10px;
+    }
+
+    .progress-bar-shell {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.05);
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg,#d4af37,#f3d27a);
+        box-shadow: 0 0 20px rgba(212,175,55,.35);
+    }
+
+    /* TABLE */
+
+    .table {
+        margin: 0;
+        vertical-align: middle;
+    }
+
+        .table thead {
+            border-color: rgba(212,175,55,.12);
+        }
+
+        .table th {
+            color: #d4af37;
+            font-weight: 700;
+            border-color: rgba(212,175,55,.08);
+            padding: 18px 16px;
+            background: rgba(255,255,255,.02);
+        }
+
+        .table td {
+            border-color: rgba(255,255,255,.04);
+            padding: 16px;
+            color: rgba(255,255,255,.82);
+        }
+
+    .table-hover tbody tr:hover {
+        background: rgba(212,175,55,.04);
+    }
+
+    /* TOP BARBER */
+
+    .top-barber {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100%;
+        text-align: center;
+    }
+
+    .top-barber-name {
+        font-size: 2rem;
+        color: white;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .top-barber-count {
+        color: #c9a96b;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* ALERT */
+
+    .alert-warning {
+        border-radius: 20px;
+        background: rgba(255,193,7,.08);
+        border: 1px solid rgba(255,193,7,.25);
+        color: #ffe7a0;
+        padding: 18px;
+    }
+
+    /* PRINT */
+
+    @@media print {
+
+        nav,
+        footer,
+        .toolbar {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+            color: black !important;
+        }
+    }
+
+    /* MOBILE */
+
+    @@media(max-width:768px) {
+
+        .metric {
+            padding: 24px;
+            border-radius: 24px;
+        }
+
+        .panel {
+            border-radius: 24px;
+            padding: 22px;
+        }
+
+        .toolbar {
+            width: 100%;
+        }
+
+            .toolbar .btn {
+                width: 100%;
+            }
+
+        .top-barber-name {
+            font-size: 1.5rem;
+        }
+
+        .chart-container {
+            height: 280px;
+        }
+    }
+
+</style>
+
+<section class="dashboard-shell">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1 class="dashboard-title">
+                Dashboard Financiero
+            </h1>
+
+            <div class="dashboard-subtitle">
+                Analítica premium del negocio
+            </div>
+
+        </div>
+
+        @if (Model.DashboardActivo)
+        {
+            <div class="toolbar">
+
+                <button class="btn btn-gold"
+                        onclick="window.print()">
+
+                    Imprimir
+
+                </button>
+
+                <a class="btn btn-outline-premium"
+                   href="/Admin/ExportarPdf">
+
+                    Exportar PDF
+
+                </a>
+
+                <a class="btn btn-outline-premium"
+                   href="/Admin/ExportarExcel">
+
+                    Exportar Excel
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+    @if (!Model.DashboardActivo)
+    {
+        <div class="alert alert-warning">
+
+            El dashboard financiero está desactivado
+            desde la configuración del sistema.
+
+        </div>
+    }
+    else
+    {
+
+        <!-- MÉTRICAS -->
+        <div class="metric-grid">
+
+            <div class="metric">
+                <span>Ingresos diarios</span>
+                <b class="money-value">
+                    @Model.IngresosDiarios.ToString("C0")
+                </b>
+            </div>
+
+            <div class="metric">
+                <span>Ingresos semanales</span>
+                <b class="money-value">
+                    @Model.IngresosSemanales.ToString("C0")
+                </b>
+            </div>
+
+            <div class="metric">
+                <span>Ingresos mensuales</span>
+                <b class="money-value">
+                    @Model.IngresosMensuales.ToString("C0")
+                </b>
+            </div>
+
+            <div class="metric">
+                <span>Ingresos anuales</span>
+                <b class="money-value">
+                    @Model.IngresosAnuales.ToString("C0")
+                </b>
+            </div>
+
+            <div class="metric">
+                <span>Cantidad de citas</span>
+                <b>@Model.CantidadCitas</b>
+            </div>
+
+            <div class="metric">
+                <span>Clientes registrados</span>
+                <b>@Model.CantidadClientes</b>
+            </div>
+
+        </div>
+
+        <!-- GRÁFICO + SERVICIOS TOP -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-lg-8">
+
+                <div class="panel">
+
+                    <h2 class="panel-title">
+                        Rendimiento Financiero
+                    </h2>
+
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="panel">
+
+                    <h2 class="panel-title">
+                        Servicios Top
+                    </h2>
+
+                    <div class="progress-list">
+
+                        @{
+                            var maxCantidad =
+                            Model.ServiciosMasVendidos.Any()
+                            ? Model.ServiciosMasVendidos.Max(x => x.Cantidad)
+                            : 1;
+                        }
+
+                        @foreach (var item in Model.ServiciosMasVendidos)
+                        {
+                            var porcentaje =
+                            (item.Cantidad * 100) / maxCantidad;
+
+                            <div class="progress-item">
+
+                                <div class="progress-header">
+
+                                    <span>@item.Nombre</span>
+
+                                    <span>@item.Cantidad</span>
+
+                                </div>
+
+                                <div class="progress-bar-shell">
+
+                                    <div class="progress-bar-fill"
+                                         style="width:@porcentaje%">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TABLA + BARBERO TOP -->
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+
+                <div class="panel">
+
+                    <h2 class="panel-title">
+                        Servicios Más Vendidos
+                    </h2>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-dark table-hover align-middle">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Cantidad</th>
+                                    <th>Total</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model.ServiciosMasVendidos)
+                                {
+                                    <tr>
+
+                                        <td>@item.Nombre</td>
+
+                                        <td>@item.Cantidad</td>
+
+                                        <td>@item.Total.ToString("C0")</td>
+
+                                    </tr>
+                                }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="panel top-barber">
+
+                <h2 class="panel-title">
+                    Barbero Top
+                </h2>
+
+                <div class="top-barber-name">
+
+                    @((Model.BarberoConMasCitas?.Nombre)
+                                        ?? "Sin datos")
+
+                </div>
+
+                <div class="top-barber-count">
+
+                    @((Model.BarberoConMasCitas?.Cantidad)
+                                        ?? 0) citas realizadas
+
+                </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        }
+
+    <script>
+
+        const ctx =
+            document.getElementById('financialChart');
+
+        if (ctx) {
+
+            new Chart(ctx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: [
+                        'Diario',
+                        'Semanal',
+                        'Mensual',
+                        'Anual'
+                    ],
+
+                    datasets: [{
+
+                        label: 'Ingresos',
+
+                        data: [
+
+                            @Model.IngresosDiarios,
+
+                            @Model.IngresosSemanales,
+
+                            @Model.IngresosMensuales,
+
+                            @Model.IngresosAnuales
+
+                        ],
+
+                        borderColor: '#d4af37',
+
+                        backgroundColor:
+                            'rgba(212,175,55,.15)',
+
+                        borderWidth: 3,
+
+                        fill: true,
+
+                        tension: .4,
+
+                        pointRadius: 5,
+
+                        pointHoverRadius: 8
+
+                    }]
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            ticks: {
+                                color: '#c9a96b'
+                            },
+
+                            grid: {
+                                color: 'rgba(255,255,255,.05)'
+                            }
+                        },
+
+                        y: {
+
+                            ticks: {
+                                color: '#c9a96b'
+                            },
+
+                            grid: {
+                                color: 'rgba(255,255,255,.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+
+</section>

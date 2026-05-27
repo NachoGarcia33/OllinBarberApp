@@ -1,0 +1,155 @@
+﻿@model List<OllinBarberApp.Models.Venta>
+
+@{
+    ViewData["Title"] = "Ventas";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+        <div>
+            <h1 class="titulo-premium">
+                Panel de Ventas
+            </h1>
+
+            <p class="subtitulo-premium">
+                Historial completo de ventas registradas
+            </p>
+        </div>
+
+        <a href="/Admin/CrearVenta"
+           class="btn btn-gold">
+
+            Nueva Venta
+
+        </a>
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-premium text-center p-5">
+
+            <h3 class="mb-3">
+                No hay ventas registradas
+            </h3>
+
+            <p class="text-light opacity-75">
+                Empieza registrando la primera venta.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="card-premium p-4">
+
+            <div class="table-responsive">
+
+                <table class="table table-dark align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Productos</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var venta in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @venta.Id
+                                </td>
+
+                                <td>
+                                    @venta.ClienteNombre
+                                </td>
+
+                                <td>
+                                    @venta.Fecha.ToString("dd/MM/yyyy hh:mm tt")
+                                </td>
+
+                                <td class="text-warning fw-bold">
+                                    $ @venta.Total.ToString("N0")
+                                </td>
+
+                                <td>
+                                    @venta.Detalles.Count producto(s)
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<style>
+
+    .titulo-premium {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #C8A96B;
+        margin-bottom: 5px;
+    }
+
+    .subtitulo-premium {
+        color: rgba(255,255,255,.7);
+        margin: 0;
+    }
+
+    .card-premium {
+        background: rgba(18,18,18,.95);
+        border: 1px solid rgba(200,169,107,.15);
+        border-radius: 24px;
+        box-shadow: 0 15px 40px rgba(0,0,0,.35);
+    }
+
+    .btn-gold {
+        background: linear-gradient(135deg,#C8A96B,#d4af37);
+        color: black;
+        font-weight: 700;
+        border-radius: 14px;
+        padding: 12px 24px;
+        border: none;
+        transition: .3s ease;
+    }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212,175,55,.25);
+            color: black;
+        }
+
+    .table {
+        margin: 0;
+    }
+
+        .table thead th {
+            border-bottom: 1px solid rgba(200,169,107,.2);
+            color: #C8A96B;
+            font-weight: 600;
+        }
+
+        .table td {
+            border-color: rgba(255,255,255,.06);
+        }
+
+</style>

@@ -1,0 +1,397 @@
+@model OllinBarberApp.Models.DashboardFinancieroViewModel
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+
+    .admin-shell {
+        width: min(1280px, calc(100% - 30px));
+        margin: 50px auto 80px;
+    }
+
+    /* HEADER */
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+    }
+
+    .admin-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.3rem, 5vw, 4rem);
+        color: #d4af37;
+        margin: 0;
+        letter-spacing: 2px;
+    }
+
+    .admin-subtitle {
+        color: #cbb06c;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: .9rem;
+    }
+
+    /* GRID PRINCIPAL */
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 22px;
+        margin-bottom: 40px;
+    }
+
+    /* CARDS */
+
+    .admin-card {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 220px;
+        padding: 30px;
+        border-radius: 28px;
+        text-decoration: none;
+        color: white;
+        background: linear-gradient( 145deg, #171717, #0f0f0f );
+        border: 1px solid rgba(212,175,55,.14);
+        box-shadow: 0 20px 50px rgba(0,0,0,.45), 0 0 30px rgba(212,175,55,.04);
+        transition: .35s ease;
+    }
+
+        /* glow */
+
+        .admin-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( 145deg, rgba(212,175,55,.10), transparent 45% );
+            opacity: 0;
+            transition: .35s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(212,175,55,.45);
+            box-shadow: 0 30px 70px rgba(0,0,0,.55), 0 0 35px rgba(212,175,55,.08);
+        }
+
+            .admin-card:hover::before {
+                opacity: 1;
+            }
+
+    .admin-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 22px;
+        background: linear-gradient( 145deg, rgba(212,175,55,.18), rgba(212,175,55,.05) );
+        border: 1px solid rgba(212,175,55,.18);
+        position: relative;
+        z-index: 2;
+    }
+
+        .admin-icon i {
+            font-size: 1.5rem;
+            color: #d4af37;
+        }
+
+    .admin-card strong {
+        position: relative;
+        z-index: 2;
+        display: block;
+        color: #d4af37;
+        font-size: 1.25rem;
+        margin-bottom: 14px;
+        font-weight: 700;
+    }
+
+    .admin-card span {
+        position: relative;
+        z-index: 2;
+        color: rgba(255,255,255,.75);
+        line-height: 1.7;
+        font-size: .95rem;
+    }
+
+    /* MÉTRICAS */
+
+    .metric-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: 22px;
+    }
+
+    .metric {
+        position: relative;
+        overflow: hidden;
+        padding: 30px;
+        border-radius: 24px;
+        background: linear-gradient( 145deg, #171717, #101010 );
+        border: 1px solid rgba(212,175,55,.12);
+        box-shadow: 0 20px 50px rgba(0,0,0,.4);
+        transition: .3s ease;
+    }
+
+        .metric:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212,175,55,.25);
+        }
+
+        .metric::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( 145deg, rgba(212,175,55,.06), transparent );
+            opacity: .8;
+        }
+
+        .metric span {
+            position: relative;
+            z-index: 2;
+            display: block;
+            color: #c9a96b;
+            font-size: .88rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .metric b {
+            position: relative;
+            z-index: 2;
+            display: block;
+            color: white;
+            font-size: clamp(2rem,4vw,3rem);
+            font-weight: 800;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width:768px) {
+
+        .admin-card {
+            min-height: 180px;
+            padding: 24px;
+        }
+
+        .metric {
+            padding: 24px;
+        }
+
+        .admin-title {
+            letter-spacing: 1px;
+        }
+    }
+
+</style>
+
+<section class="admin-shell">
+
+    <div class="admin-header">
+
+        <div>
+
+            <h1 class="admin-title">
+                Panel Administrativo
+            </h1>
+
+            <div class="admin-subtitle">
+                Control total del negocio premium
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="admin-grid">
+
+        <a href="/Admin/Barberos"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-scissors"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Barberos
+                </strong>
+
+                <span>
+                    @ViewBag.BarberosActivos activos
+                </span>
+
+            </div>
+
+        </a>
+
+        <a href="/Admin/Servicios"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-stars"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Servicios
+                </strong>
+
+                <span>
+                    @ViewBag.ServiciosActivos activos
+                </span>
+
+            </div>
+
+        </a>
+
+        <a href="/Admin/Productos"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-bag"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Tienda
+                </strong>
+
+                <span>
+                    @ViewBag.ProductosActivos productos activos
+                </span>
+
+            </div>
+
+        </a>
+
+        <a href="/Admin/Ventas"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Ventas
+                </strong>
+
+                <span>
+                    Panel de ventas e inventario
+                </span>
+
+            </div>
+
+        </a>
+
+        <a href="/Admin/Configuracion"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-gear"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Configuración
+                </strong>
+
+                <span>
+                    WhatsApp, tienda y dashboard
+                </span>
+
+            </div>
+
+        </a>
+
+        <a href="/Admin/Dashboard"
+           class="admin-card">
+
+            <div class="admin-icon">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Dashboard financiero
+                </strong>
+
+                <span>
+                    @(Model.DashboardActivo ? "Activo" : "Desactivado")
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+    <div class="metric-row">
+
+        <div class="metric">
+
+            <span>
+                Citas hoy
+            </span>
+
+            <b>
+                @ViewBag.CitasHoy
+            </b>
+
+        </div>
+
+        <div class="metric">
+
+            <span>
+                Ingresos diarios
+            </span>
+
+            <b>
+                @Model.IngresosDiarios.ToString("C0")
+            </b>
+
+        </div>
+
+        <div class="metric">
+
+            <span>
+                Ingresos mensuales
+            </span>
+
+            <b>
+                @Model.IngresosMensuales.ToString("C0")
+            </b>
+
+        </div>
+
+        <div class="metric">
+
+            <span>
+                Clientes
+            </span>
+
+            <b>
+                @Model.CantidadClientes
+            </b>
+
+        </div>
+
+    </div>
+
+</section>
