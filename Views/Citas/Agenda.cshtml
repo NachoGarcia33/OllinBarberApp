@@ -72,7 +72,7 @@
     }
 
     .agenda-table {
-        min-width: 760px;
+        width: 100%;
         margin-bottom: 0;
     }
 
@@ -135,6 +135,52 @@
         text-align: center;
         background: #111;
     }
+
+    @@media (max-width: 768px) {
+
+        .agenda-shell {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .agenda-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .agenda-title {
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .agenda-table th,
+        .agenda-table td {
+            min-width: 110px;
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        .slot-state {
+            min-height: auto;
+            padding: 6px;
+            font-size: 11px;
+        }
+
+        .slot-free {
+            padding: 8px;
+            font-size: 11px;
+        }
+
+        .slot-actions {
+            flex-direction: column;
+        }
+
+            .slot-actions .btn {
+                width: 100%;
+                font-size: 11px;
+            }
+    }
 </style>
 
 <section class="agenda-shell">
@@ -192,17 +238,39 @@
                                             @if (cita.Estado == EstadoCita.Pendiente)
                                             {
                                                 <div class="slot-actions">
+
                                                     <form method="post" action="/Citas/MarcarAtendido">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@cita.Id" />
-                                                        <button class="btn btn-sm btn-success">Llegó</button>
+                                                        <button class="btn btn-sm btn-success">
+                                                            Llegó
+                                                        </button>
                                                     </form>
 
                                                     <form method="post" action="/Citas/Cancelar">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@cita.Id" />
-                                                        <button class="btn btn-sm btn-danger">Cancelar</button>
+                                                        <button class="btn btn-sm btn-danger">
+                                                            Cancelar
+                                                        </button>
                                                     </form>
+
+                                                </div>
+                                            }
+                                            else if (cita.Estado == EstadoCita.NoAsistio ||
+                                            cita.Estado == EstadoCita.Cancelada)
+                                            {
+                                                <div class="slot-actions">
+
+                                                    <form method="post" action="/Citas/Reactivar">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@cita.Id" />
+
+                                                        <button class="btn btn-sm btn-warning">
+                                                            Rehabilitar
+                                                        </button>
+                                                    </form>
+
                                                 </div>
                                             }
                                         </div>

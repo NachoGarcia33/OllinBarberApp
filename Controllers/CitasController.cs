@@ -158,6 +158,21 @@ namespace OllinBarberApp.Controllers
             return RedirectToAction("Agenda");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Reactivar(int id)
+        {
+            var cita = _context.Citas.FirstOrDefault(c => c.Id == id);
+
+            if (cita != null && PuedeGestionarCita(cita))
+            {
+                _context.Citas.Remove(cita);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Agenda");
+        }
+
         public IActionResult Agenda(DateTime? fecha)
         {
             var fechaBase = fecha ?? DateTime.Today;
@@ -320,7 +335,9 @@ namespace OllinBarberApp.Controllers
 
                 var finCita = cita.FechaHora.AddMinutes(servicio.Duracion);
 
-                if (DateTime.Now > finCita)
+                var limiteNoAsistencia = finCita.AddMinutes(60);
+
+                if (DateTime.Now > limiteNoAsistencia)
                 {
                     cita.Estado = EstadoCita.NoAsistio;
                     huboCambios = true;
@@ -349,6 +366,12 @@ namespace OllinBarberApp.Controllers
             if (string.IsNullOrWhiteSpace(telefono))
             {
                 return;
+            }
+
+            // Si tiene 10 dígitos asumimos Colombia
+            if (telefono.Length == 10)
+            {
+                telefono = "57" + telefono;
             }
 
             var mensaje = Uri.EscapeDataString(
