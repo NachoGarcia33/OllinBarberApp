@@ -1,28 +1,204 @@
-﻿<h2 style="text-align:center; color:gold;">Registro</h2>
+﻿@{
+    ViewData["Title"] = "Registro";
+}
 
-<form method="post" style="max-width:400px; margin:auto;">
+<div class="register-container">
 
-    <input name="nombre" placeholder="Nombre completo" class="form-control" required />
-    <br />
+    <div class="register-card">
 
-    <input name="celular" placeholder="Celular" class="form-control" required />
-    <br />
+        <div class="text-center mb-4">
 
-    <input name="fechaNacimiento" type="date" class="form-control" required />
-    <br />
+            <img src="~/images/logo.png"
+                 alt="Ollin Barber"
+                 class="logo-register" />
 
-    <input name="email" placeholder="Correo" class="form-control" required />
-    <br />
+            <h1 class="titulo-premium">
+                Crear Cuenta
+            </h1>
 
-    <input name="password" type="password" placeholder="Contraseña" class="form-control" required />
-    <br />
+            <p class="subtitulo-premium">
+                Únete a la experiencia Ollin Barber
+            </p>
 
-    <button type="submit" style="width:100%; background:gold; border:none; padding:10px;">
-        Registrarse
-    </button>
+        </div>
 
-    @if (ViewBag.Error != null)
-    {
-        <p style="color:red; text-align:center;">@ViewBag.Error</p>
+        <form method="post">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Nombre completo
+                </label>
+
+                <input name="nombre"
+                       class="form-control input-premium"
+                       placeholder="Ej: Pedro García"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Teléfono
+                </label>
+
+                <input name="celular"
+                       class="form-control input-premium"
+                       placeholder="3001234567"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Fecha de nacimiento
+                </label>
+
+                <input name="fechaNacimiento"
+                       type="date"
+                       class="form-control input-premium date-premium"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Correo electrónico
+                </label>
+
+                <input name="email"
+                       type="email"
+                       class="form-control input-premium"
+                       placeholder="correo@ejemplo.com"
+                       required />
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Contraseña
+                </label>
+
+                <input name="password"
+                       type="password"
+                       class="form-control input-premium"
+                       placeholder="********"
+                       required />
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-gold w-100">
+
+                Registrarme
+
+            </button>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-4 text-center">
+                    @ViewBag.Error
+                </div>
+            }
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+    body {
+        background: #0d0d0d;
     }
-</form>
+
+    .register-container {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 650px;
+        background: rgba(18,18,18,.97);
+        border: 1px solid rgba(200,169,107,.15);
+        border-radius: 28px;
+        padding: 40px;
+        box-shadow: 0 25px 50px rgba(0,0,0,.45);
+    }
+
+    .logo-register {
+        width: 110px;
+        margin-bottom: 15px;
+    }
+
+    .titulo-premium {
+        color: #C8A96B;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .subtitulo-premium {
+        color: rgba(255,255,255,.7);
+    }
+
+    .form-label {
+        color: rgba(255,255,255,.85);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .input-premium {
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(200,169,107,.15);
+        color: white !important;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+        .input-premium:focus {
+            background: rgba(255,255,255,.06);
+            border-color: #C8A96B;
+            box-shadow: 0 0 0 .2rem rgba(200,169,107,.15);
+            color: white;
+        }
+
+    .date-premium::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+
+    .btn-gold {
+        background: linear-gradient(135deg,#C8A96B,#d4af37);
+        border: none;
+        color: black;
+        font-weight: 700;
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+        .btn-gold:hover {
+            color: black;
+            transform: translateY(-2px);
+        }
+
+    @@media(max-width:768px) {
+
+        .register-card {
+            padding: 25px;
+        }
+
+        .logo-register {
+            width: 90px;
+        }
+    }
+
+</style>
