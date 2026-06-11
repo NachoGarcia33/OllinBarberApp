@@ -47,8 +47,19 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var db = services.GetRequiredService<ApplicationDbContext>();
 
-    db.Database.Migrate();
-    NormalizarConfiguracionSistema(db);
+    try
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            db.Database.Migrate();
+        }
+
+        NormalizarConfiguracionSistema(db);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al inicializar BD: {ex.Message}");
+    }
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
