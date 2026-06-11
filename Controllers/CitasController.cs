@@ -82,12 +82,21 @@ namespace OllinBarberApp.Controllers
             cita.BarberoId = barbero!.Id;
             cita.Barbero = barbero.Nombre;
 
+
             _context.Citas.Add(cita);
             _context.SaveChanges();
 
             PrepararConfirmacionWhatsApp(cita, servicio!, barbero);
 
             TempData["Success"] = "Cita registrada correctamente.";
+
+            var whatsappUrl = TempData["WhatsAppUrl"]?.ToString();
+
+            if (!string.IsNullOrEmpty(whatsappUrl))
+            {
+                return Redirect(whatsappUrl);
+            }
+
             return RedirectToAction("Agenda");
         }
 
@@ -95,6 +104,7 @@ namespace OllinBarberApp.Controllers
         {
             var barberos = ObtenerBarberosPermitidos(disponibles: false);
             var citas = _context.Citas
+                .AsNoTracking()
                 .Include(c => c.Servicio)
                 .Include(c => c.BarberoEntidad)
                 .AsQueryable();
@@ -166,20 +176,43 @@ namespace OllinBarberApp.Controllers
 
             if (cita != null && PuedeGestionarCita(cita))
             {
-                _context.Citas.Remove(cita);
+                // No borrar la cita.
+                // Solo marcarla como liberada.
+                cita.Estado = EstadoCita.Cancelada;
                 _context.SaveChanges();
             }
 
             return RedirectToAction("Agenda");
         }
 
+        public IActionResult Confirmar(int id)
+        {
+            var cita = _context.Citas
+                .FirstOrDefault(c => c.Id == id);
+
+            if (cita == null)
+            {
+                return NotFound();
+            }
+
+            cita.Estado = EstadoCita.Confirmada;
+
+            _context.SaveChanges();
+
+            TempData["Success"] =
+                "Cita confirmada correctamente";
+
+            return RedirectToAction("Agenda");
+        }
+
         public IActionResult Agenda(DateTime? fecha)
         {
-            var fechaBase = fecha ?? DateTime.Today;
+            var fechaBase = (fecha ?? DateTime.Today).Date;
             var horarios = CrearHorarios(fechaBase);
             var barberos = ObtenerBarberosPermitidos(disponibles: false);
 
             var citas = _context.Citas
+                .AsNoTracking()
                 .Include(c => c.Servicio)
                 .Include(c => c.BarberoEntidad)
                 .Where(c => c.FechaHora.Date == fechaBase.Date)
@@ -277,8 +310,9 @@ namespace OllinBarberApp.Controllers
         {
             var citasBarbero = _context.Citas
                 .Where(c =>
-                    c.Estado == EstadoCita.Pendiente &&
-                    (c.BarberoId == barbero.Id || c.Barbero == barbero.Nombre))
+                     (c.Estado == EstadoCita.Pendiente ||
+                     c.Estado == EstadoCita.Confirmada) &&
+                     (c.BarberoId == barbero.Id || c.Barbero == barbero.Nombre))
                 .ToList();
 
             foreach (var citaExistente in citasBarbero)
@@ -337,7 +371,7 @@ namespace OllinBarberApp.Controllers
 
                 var limiteNoAsistencia = finCita.AddMinutes(60);
 
-                if (DateTime.Now > limiteNoAsistencia)
+                if (DateTime.UtcNow > limiteNoAsistencia.ToUniversalTime())
                 {
                     cita.Estado = EstadoCita.NoAsistio;
                     huboCambios = true;
@@ -356,28 +390,47 @@ namespace OllinBarberApp.Controllers
                 .OrderByDescending(c => c.Id)
                 .FirstOrDefault();
 
-            if (config?.WhatsappActivo != true || string.IsNullOrWhiteSpace(cita.Telefono))
+            if (config?.WhatsappActivo != true)
             {
                 return;
             }
 
-            var telefono = new string(cita.Telefono.Where(char.IsDigit).ToArray());
+            var telefono = new string(
+                barbero.Telefono
+                .Where(char.IsDigit)
+                .ToArray());
 
             if (string.IsNullOrWhiteSpace(telefono))
             {
                 return;
             }
 
-            // Si tiene 10 dígitos asumimos Colombia
             if (telefono.Length == 10)
             {
                 telefono = "57" + telefono;
             }
 
-            var mensaje = Uri.EscapeDataString(
-                $"Hola {cita.ClienteNombre}, tu cita en Ollin Barber quedó agendada para {cita.FechaHora:dd/MM/yyyy HH:mm} con {barbero.Nombre}. Servicio: {servicio.Nombre}.");
+            var urlConfirmacion =
+                $"{Request.Scheme}://{Request.Host}/Citas/Confirmar/{cita.Id}";
 
-            TempData["WhatsAppUrl"] = $"https://wa.me/{telefono}?text={mensaje}";
+            var mensaje = Uri.EscapeDataString(
+        $@"Nueva cita pendiente de confirmación
+
+        Cliente: {cita.ClienteNombre}
+        Teléfono: {cita.Telefono}
+
+        Servicio: {servicio.Nombre}
+        Valor: ${servicio.Precio:N0} COP
+
+        Fecha: {cita.FechaHora:dd/MM/yyyy}
+        Hora: {cita.FechaHora:hh:mm tt}
+
+        CONFIRMAR CITA:
+        {urlConfirmacion}");
+
+            TempData["WhatsAppUrl"] =
+                $"https://wa.me/{telefono}?text={mensaje}";
         }
     }
+
 }

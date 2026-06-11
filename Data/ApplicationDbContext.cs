@@ -35,6 +35,10 @@ namespace OllinBarberApp.Data
                 .HasConversion<string>();
 
             modelBuilder.Entity<Cita>()
+                .Property(c => c.FechaHora)
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity<Cita>()
                 .HasOne(c => c.Servicio)
                 .WithMany(s => s.Citas)
                 .HasForeignKey(c => c.ServicioId)

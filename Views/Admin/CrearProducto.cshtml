@@ -3,7 +3,9 @@
 <section class="container py-4" style="max-width:760px;">
     <h1 class="mb-3" style="color:#d4af37;">Nuevo producto</h1>
 
-    <form method="post" class="bg-dark border border-warning rounded p-4">
+    <form method="post"
+          enctype="multipart/form-data"
+          class="bg-dark border border-warning rounded p-4">
         @Html.AntiForgeryToken()
 
         <div class="mb-3">
@@ -42,10 +44,14 @@
         </div>
 
         <div class="mb-3 mt-3">
-            <label class="form-label">Imagen URL</label>
+            <label class="form-label">
+                Imagen del producto
+            </label>
 
-            <input asp-for="ImagenUrl"
-                   class="form-control" />
+            <input type="file"
+                   name="ImagenArchivo"
+                   class="form-control"
+                   accept="image/*" />
         </div>
 
         <div class="form-check mb-4">

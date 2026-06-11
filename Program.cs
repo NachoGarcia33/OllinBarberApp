@@ -3,18 +3,31 @@ using Microsoft.EntityFrameworkCore;
 using OllinBarberApp.Data;
 using OllinBarberApp.Models;
 
+
+AppContext.SetSwitch(
+    "Npgsql.EnableLegacyTimestampBehavior",
+    true
+);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=ollinbarber.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    // Contraseñas
+    options.Password.RequireDigit = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
+    options.Password.RequiredLength = 8;
+
+    // Bloqueo por intentos fallidos
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
@@ -48,7 +61,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    var adminEmail = "admin@ollin.com";
+    var adminEmail = "Pedro88hernandez13@gmail.com";
     var admin = await userManager.FindByEmailAsync(adminEmail);
 
     if (admin == null)
@@ -57,18 +70,24 @@ using (var scope = app.Services.CreateScope())
         {
             UserName = adminEmail,
             Email = adminEmail,
-            Nombre = "Administrador",
-            Celular = "3000000000",
+            Nombre = "Pedro Hernandez",
+            Celular = "3045580585",
             EsBarbero = false,
             Disponible = true
         };
 
-        await userManager.CreateAsync(user, "123456");
-        await userManager.AddToRoleAsync(user, "Admin");
+        var result = await userManager.CreateAsync(
+            user,
+            "PedroBarber2026!"
+        );
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
     }
 }
-
-if (!app.Environment.IsDevelopment())
+    if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();

@@ -18,6 +18,9 @@ namespace OllinBarberApp.Models
 
         public bool Activo { get; set; } = true;
 
+        // NUEVO
+        public string? ImagenUrl { get; set; }
+
         [ValidateNever]
         public ICollection<Cita> Citas { get; set; } = new List<Cita>();
     }

@@ -55,11 +55,21 @@ namespace OllinBarberApp.Controllers
         // 🔥 REGISTER POST
         [HttpPost]
         public async Task<IActionResult> Register(
-            string email,
-            string password,
-            string nombre,
-            string celular)
+    string email,
+    string password,
+    string nombre,
+    string celular)
         {
+            // Verificar si el correo ya existe
+            var usuarioExistente = await _userManager.FindByEmailAsync(email);
+
+            if (usuarioExistente != null)
+            {
+                ViewBag.Error = "Este correo electrónico ya está registrado.";
+
+                return View();
+            }
+
             var user = new ApplicationUser
             {
                 UserName = email,
@@ -74,7 +84,8 @@ namespace OllinBarberApp.Controllers
 
             if (result.Succeeded)
             {
-                TempData["Success"] = $"Bienvenido {nombre} 🎉 Registro exitoso";
+                TempData["Success"] =
+                    $"Bienvenido {nombre} 🎉 Registro exitoso";
 
                 return RedirectToAction("Login");
             }

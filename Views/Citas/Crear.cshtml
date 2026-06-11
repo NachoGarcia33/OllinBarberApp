@@ -330,10 +330,14 @@
                     Fecha y hora
                 </label>
 
+                <small class="text-warning">
+                    Horario de atención: 8:00 AM a 12:00PM -2:00PM a 6:30 PM
+                </small>
+
                 <input asp-for="FechaHora"
                        type="datetime-local"
                        class="form-control"
-                       value="@(Model.FechaHora != DateTime.MinValue ? Model.FechaHora.ToString("yyyy-MM-ddTHH:mm") : "")"
+                       min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
                        required />
 
             </div>
@@ -343,6 +347,8 @@
                 <label class="form-label">
                     Servicio
                 </label>
+
+                
 
                 <select asp-for="ServicioId"
                         class="form-select"

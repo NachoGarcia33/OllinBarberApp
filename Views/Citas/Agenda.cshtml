@@ -7,27 +7,35 @@
     var fecha = (string)ViewBag.Fecha;
 
     Func<Barbero, DateTime, Cita?> obtenerCita = (barbero, hora) =>
+{
+    return Model.citas.FirstOrDefault(c =>
     {
-        return Model.citas.FirstOrDefault(c =>
+        // Ignorar citas canceladas o no asistidas
+        if (c.Estado == EstadoCita.Cancelada ||
+            c.Estado == EstadoCita.NoAsistio)
         {
-            if (c.BarberoId != barbero.Id && c.Barbero != barbero.Nombre)
-            {
-                return false;
-            }
+            return false;
+        }
 
-            var servicio = servicios.FirstOrDefault(s => s.Id == c.ServicioId);
+        if (c.BarberoId != barbero.Id &&
+            c.Barbero != barbero.Nombre)
+        {
+            return false;
+        }
 
-            if (servicio == null)
-            {
-                return false;
-            }
+        var servicio = servicios.FirstOrDefault(s => s.Id == c.ServicioId);
 
-            var inicio = c.FechaHora;
-            var fin = c.FechaHora.AddMinutes(servicio.Duracion);
+        if (servicio == null)
+        {
+            return false;
+        }
 
-            return hora >= inicio && hora < fin;
-        });
-    };
+        var inicio = c.FechaHora;
+        var fin = c.FechaHora.AddMinutes(servicio.Duracion);
+
+        return hora >= inicio && hora < fin;
+    });
+};
 
     Func<EstadoCita, string> claseEstado = estado => estado switch
     {

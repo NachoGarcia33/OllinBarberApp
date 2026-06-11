@@ -10,7 +10,7 @@ namespace OllinBarberApp.Models
 
         public string Telefono { get; set; } = string.Empty;
 
-        public DateTime FechaHora { get; set; }
+        public DateTimeOffset FechaHora { get; set; }
 
         public string Barbero { get; set; } = string.Empty;
 
