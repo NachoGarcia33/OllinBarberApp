@@ -11,8 +11,12 @@ AppContext.SetSwitch(
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString =
+    Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -49,16 +53,22 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        if (app.Environment.IsDevelopment())
-        {
-            db.Database.Migrate();
-        }
+        Console.WriteLine("Iniciando migraciones...");
+
+        await db.Database.MigrateAsync();
+
+        Console.WriteLine("Migraciones completadas.");
 
         NormalizarConfiguracionSistema(db);
+
+        Console.WriteLine("Configuración normalizada.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error al inicializar BD: {ex.Message}");
+        Console.WriteLine("ERROR DE INICIALIZACION");
+        Console.WriteLine(ex.ToString());
+
+        throw;
     }
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
