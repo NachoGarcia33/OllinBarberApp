@@ -53,11 +53,9 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        Console.WriteLine("Iniciando migraciones...");
+        Console.WriteLine("Migraciones omitidas temporalmente");
 
-        await db.Database.MigrateAsync();
-
-        Console.WriteLine("Migraciones completadas.");
+        // await db.Database.MigrateAsync();
 
         NormalizarConfiguracionSistema(db);
 
@@ -65,9 +63,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine("ERROR DE INICIALIZACION");
         Console.WriteLine(ex.ToString());
-
         throw;
     }
 
