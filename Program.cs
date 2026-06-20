@@ -57,7 +57,7 @@ using (var scope = app.Services.CreateScope())
 
         // await db.Database.MigrateAsync();
 
-        //NormalizarConfiguracionSistema(db);
+        NormalizarConfiguracionSistema(db);
 
         Console.WriteLine("Configuración normalizada.");
     }
