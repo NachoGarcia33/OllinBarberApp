@@ -55,7 +55,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("Migraciones omitidas temporalmente");
 
-        // await db.Database.MigrateAsync();
+        await db.Database.MigrateAsync();
 
         NormalizarConfiguracionSistema(db);
 
@@ -67,7 +67,7 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 
-    /*var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
     foreach (var role in new[] { "Admin", "Barbero" })
@@ -102,7 +102,7 @@ using (var scope = app.Services.CreateScope())
         {
             await userManager.AddToRoleAsync(user, "Admin");
         }
-    }*/
+    }
 }
     if (!app.Environment.IsDevelopment())
 {
