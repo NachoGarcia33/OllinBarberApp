@@ -71,12 +71,43 @@ namespace OllinBarberApp.Controllers
             {
                 ModelState.AddModelError("", "El barbero ya tiene una cita en ese horario.");
             }
+            if (servicio != null && barbero != null && ExisteConflictoHorario(cita, servicio, barbero))
+            {
+                ModelState.AddModelError("", "El barbero ya tiene una cita en ese horario.");
+            }
+
+            // VALIDAR HORARIO
+            var hora = cita.FechaHora.TimeOfDay;
+
+            bool horarioManana =
+                hora >= new TimeSpan(9, 0, 0) &&
+                hora < new TimeSpan(12, 0, 0);
+
+            bool horarioTarde =
+                hora >= new TimeSpan(14, 0, 0) &&
+                hora <= new TimeSpan(18, 30, 0);
+
+            if (!horarioManana && !horarioTarde)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Solo se permiten citas entre 9:00 AM - 12:00 PM y 2:00 PM - 6:30 PM.");
+            }
+
+            // AQUÍ RECIÉN VALIDAMOS
+            if (!ModelState.IsValid)
+            {
+                CargarCombos(barberos);
+                return View(cita);
+            }
 
             if (!ModelState.IsValid)
             {
                 CargarCombos(barberos);
                 return View(cita);
             }
+
+
 
             cita.Estado = EstadoCita.Pendiente;
             cita.BarberoId = barbero!.Id;

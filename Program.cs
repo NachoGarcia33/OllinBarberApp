@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OllinBarberApp.Data;
 using OllinBarberApp.Models;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 
 AppContext.SetSwitch(
@@ -113,6 +115,24 @@ else
 {
     app.UseDeveloperExceptionPage();
 }
+
+var cultura = new CultureInfo("es-CO");
+
+CultureInfo.DefaultThreadCurrentCulture = cultura;
+CultureInfo.DefaultThreadCurrentUICulture = cultura;
+
+app.UseRequestLocalization(
+    new RequestLocalizationOptions
+    {
+        DefaultRequestCulture =
+            new RequestCulture("es-CO"),
+
+        SupportedCultures =
+            new[] { cultura },
+
+        SupportedUICultures =
+            new[] { cultura }
+    });
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
