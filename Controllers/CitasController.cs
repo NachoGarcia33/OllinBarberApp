@@ -91,10 +91,11 @@ namespace OllinBarberApp.Controllers
             {
                 ModelState.AddModelError(
                     "",
-                    "Solo se permiten citas entre 9:00 AM - 12:00 PM y 2:00 PM - 6:30 PM.");
+                    "Solo se permiten citas entre 9:00 AM y 12:00 PM o entre 2:00 PM y 6:30 PM.");
             }
 
-            // AQUÍ RECIÉN VALIDAMOS
+            // ← RECIÉN AQUÍ
+
             if (!ModelState.IsValid)
             {
                 CargarCombos(barberos);
