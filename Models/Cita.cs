@@ -14,7 +14,7 @@ namespace OllinBarberApp.Models
         [Required(ErrorMessage = "El teléfono es obligatorio.")]
         [RegularExpression(
             @"^[0-9]{10}$",
-            ErrorMessage = "Ingrese un número celular válido de 10 dígitos.")]
+            ErrorMessage = "Ingrese un celular valido de 10 digitos.")]
         public string Telefono { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Debe seleccionar una fecha y hora.")]
