@@ -55,13 +55,13 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        Console.WriteLine("Migraciones omitidas temporalmente");
+        Console.WriteLine("Aplicando migraciones...");
 
         await db.Database.MigrateAsync();
 
         NormalizarConfiguracionSistema(db);
 
-        Console.WriteLine("Configuración normalizada.");
+        Console.WriteLine("Migraciones aplicadas correctamente.");
     }
     catch (Exception ex)
     {
@@ -80,7 +80,9 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    var adminEmail = "Pedro88hernandez13@gmail.com";
+    var adminEmail =
+    Environment.GetEnvironmentVariable("ADMIN_EMAIL")
+    ?? "admin@ollinbarber.com";
     var admin = await userManager.FindByEmailAsync(adminEmail);
 
     if (admin == null)
@@ -95,10 +97,13 @@ using (var scope = app.Services.CreateScope())
             Disponible = true
         };
 
+        var adminPassword =
+            Environment.GetEnvironmentVariable("ADMIN_PASSWORD")
+            ?? "Cambiar123!";
         var result = await userManager.CreateAsync(
-            user,
-            "PedroBarber2026!"
-        );
+    user,
+    adminPassword
+);
 
         if (result.Succeeded)
         {
