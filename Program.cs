@@ -82,7 +82,7 @@ using (var scope = app.Services.CreateScope())
 
     var adminEmail =
     Environment.GetEnvironmentVariable("ADMIN_EMAIL")
-    ?? "admin@ollinbarber.com";
+    ?? "pedro88hernandez13@gmail.com";
     var admin = await userManager.FindByEmailAsync(adminEmail);
 
     if (admin == null)
@@ -99,7 +99,7 @@ using (var scope = app.Services.CreateScope())
 
         var adminPassword =
             Environment.GetEnvironmentVariable("ADMIN_PASSWORD")
-            ?? "Cambiar123!";
+            ?? "PedroBarber2026!";
         var result = await userManager.CreateAsync(
     user,
     adminPassword
