@@ -85,13 +85,13 @@ namespace OllinBarberApp.Controllers
 
             bool horarioTarde =
                 hora >= new TimeSpan(14, 0, 0) &&
-                hora <= new TimeSpan(18, 30, 0);
+                hora <= new TimeSpan(19, 30, 0);
 
             if (!horarioManana && !horarioTarde)
             {
                 ModelState.AddModelError(
                     "",
-                    "Solo se permiten citas entre 9:00 AM y 12:00 PM o entre 2:00 PM y 6:30 PM.");
+                    "Solo se permiten citas entre 9:00 AM y 12:00 PM o entre 2:00 PM y 7:30 PM.");
             }
 
             // ← RECIÉN AQUÍ
