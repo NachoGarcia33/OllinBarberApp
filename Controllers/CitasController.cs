@@ -71,10 +71,6 @@ namespace OllinBarberApp.Controllers
             {
                 ModelState.AddModelError("", "El barbero ya tiene una cita en ese horario.");
             }
-            if (servicio != null && barbero != null && ExisteConflictoHorario(cita, servicio, barbero))
-            {
-                ModelState.AddModelError("", "El barbero ya tiene una cita en ese horario.");
-            }
 
             // VALIDAR HORARIO
             var hora = cita.FechaHora.TimeOfDay;
@@ -101,14 +97,6 @@ namespace OllinBarberApp.Controllers
                 CargarCombos(barberos);
                 return View(cita);
             }
-
-            if (!ModelState.IsValid)
-            {
-                CargarCombos(barberos);
-                return View(cita);
-            }
-
-
 
             cita.Estado = EstadoCita.Pendiente;
             cita.BarberoId = barbero!.Id;
@@ -374,13 +362,23 @@ namespace OllinBarberApp.Controllers
         private static List<DateTime> CrearHorarios(DateTime fechaBase)
         {
             var horarios = new List<DateTime>();
-            var inicio = fechaBase.Date.AddHours(9);
-            var fin = fechaBase.Date.AddHours(19);
 
-            while (inicio < fin)
+            // Jornada mañana
+            var hora = fechaBase.Date.AddHours(9);
+
+            while (hora <= fechaBase.Date.AddHours(12))
             {
-                horarios.Add(inicio);
-                inicio = inicio.AddMinutes(30);
+                horarios.Add(hora);
+                hora = hora.AddMinutes(30);
+            }
+
+            // Jornada tarde
+            hora = fechaBase.Date.AddHours(14);
+
+            while (hora <= fechaBase.Date.AddHours(19).AddMinutes(30))
+            {
+                horarios.Add(hora);
+                hora = hora.AddMinutes(30);
             }
 
             return horarios;
