@@ -315,15 +315,7 @@ namespace OllinBarberApp.Controllers
 
         private bool PuedeGestionarCita(Cita cita)
         {
-            if (!User.IsInRole("Barbero"))
-            {
-                return true;
-            }
-
-            var barberoActual = ObtenerBarberoActual();
-
-            return barberoActual != null &&
-                (cita.BarberoId == barberoActual.Id || cita.Barbero == barberoActual.Nombre);
+            return User.IsInRole("Admin");
         }
 
         private bool ExisteConflictoHorario(Cita nuevaCita, Servicio servicioNuevo, Barbero barbero)

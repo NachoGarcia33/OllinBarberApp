@@ -53,8 +53,10 @@
 
 <style>
     .agenda-shell {
-        width: min(1200px, calc(100% - 24px));
+        width: 100%;
+        max-width: 1400px;
         margin: 30px auto 60px;
+        padding: 0 12px;
     }
 
     .agenda-toolbar {
@@ -74,9 +76,10 @@
 
     .agenda-card {
         background: #111;
-        border: 1px solid rgba(212, 175, 55, .45);
+        border: 1px solid rgba(212,175,55,.45);
         border-radius: 8px;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
 
     .agenda-table {
@@ -144,6 +147,7 @@
         background: #111;
     }
 
+
     @@media (max-width: 768px) {
 
         .agenda-shell {
@@ -164,9 +168,9 @@
 
         .agenda-table th,
         .agenda-table td {
-            min-width: 90px;
-            font-size: 11px;
-            padding: 4px;
+            min-width: 130px;
+            font-size: 12px;
+            padding: 6px;
         }
 
         .slot-state {
@@ -243,13 +247,14 @@
                                             <strong>@cita.ClienteNombre</strong>
                                             <div>@textoEstado(cita.Estado)</div>
 
-                                            @if (cita.Estado == EstadoCita.Pendiente)
+                                            @if (User.IsInRole("Admin") && cita.Estado == EstadoCita.Pendiente)
                                             {
                                                 <div class="slot-actions">
 
                                                     <form method="post" action="/Citas/MarcarAtendido">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@cita.Id" />
+
                                                         <button class="btn btn-sm btn-success">
                                                             Llegó
                                                         </button>
@@ -258,6 +263,7 @@
                                                     <form method="post" action="/Citas/Cancelar">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@cita.Id" />
+
                                                         <button class="btn btn-sm btn-danger">
                                                             Cancelar
                                                         </button>
@@ -265,8 +271,9 @@
 
                                                 </div>
                                             }
-                                            else if (cita.Estado == EstadoCita.NoAsistio ||
-                                            cita.Estado == EstadoCita.Cancelada)
+                                            else if (User.IsInRole("Admin") &&
+                                                    (cita.Estado == EstadoCita.NoAsistio ||
+                                                    cita.Estado == EstadoCita.Cancelada))
                                             {
                                                 <div class="slot-actions">
 
