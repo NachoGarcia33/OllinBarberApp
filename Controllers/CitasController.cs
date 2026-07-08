@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OllinBarberApp.Data;
 using OllinBarberApp.Models;
-
+using Microsoft.AspNetCore.Authorization;
 namespace OllinBarberApp.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class CitasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +17,8 @@ namespace OllinBarberApp.Controllers
             _context = context;
         }
 
+
+        [AllowAnonymous]
         public IActionResult Crear(DateTime? fechaHora, string? barbero, int? barberoId)
         {
             var cita = new Cita();
@@ -41,6 +43,7 @@ namespace OllinBarberApp.Controllers
             return View(cita);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Crear(Cita cita)
@@ -225,6 +228,7 @@ namespace OllinBarberApp.Controllers
             return RedirectToAction("Agenda");
         }
 
+        [AllowAnonymous]
         public IActionResult Agenda(DateTime? fecha)
         {
             var fechaBase = (fecha ?? DateTime.Today).Date;

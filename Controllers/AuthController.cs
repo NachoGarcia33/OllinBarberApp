@@ -39,7 +39,7 @@ namespace OllinBarberApp.Controllers
                 false);
 
             if (result.Succeeded)
-                return RedirectToAction("Agenda", "Citas");
+                return RedirectToAction("Index", "Home");
 
             ViewBag.Error = "Correo o contraseña incorrectos";
 
