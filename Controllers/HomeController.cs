@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OllinBarberApp.Data;
-using System.Linq;
 
 namespace OllinBarberApp.Controllers
 {
-    [Authorize] // 🔥 ESTO ES LO QUE FALTABA
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
