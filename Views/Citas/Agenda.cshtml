@@ -147,6 +147,15 @@
         background: #111;
     }
 
+    /* Nombre completo por defecto */
+    .nombre-completo {
+        display: inline;
+    }
+
+    /* Nombre corto oculto en computador */
+    .nombre-corto {
+        display: none;
+    }
 
     @@media (max-width: 768px) {
 
@@ -168,9 +177,17 @@
 
         .agenda-table th,
         .agenda-table td {
-            min-width: 130px;
-            font-size: 12px;
-            padding: 6px;
+            min-width: 95px;
+            font-size: 11px;
+            padding: 4px;
+        }
+        /* En celular ocultamos el nombre completo */
+        .nombre-completo {
+            display: none;
+        }
+        /* y mostramos solo el primer nombre */
+        .nombre-corto {
+            display: inline;
         }
 
         .slot-state {
@@ -226,7 +243,12 @@
                         <th>Hora</th>
                         @foreach (var barbero in barberos)
                         {
-                            <th>@barbero.Nombre</th>
+                            <th title="@barbero.Nombre">
+                                <span class="nombre-completo">@barbero.Nombre</span>
+                                <span class="nombre-corto">
+                                    @(barbero.Nombre.Split(' ')[0])
+                                </span>
+                            </th>
                         }
                     </tr>
                 </thead>
