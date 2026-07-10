@@ -21,7 +21,10 @@ namespace OllinBarberApp.Controllers
         [AllowAnonymous]
         public IActionResult Crear(DateTime? fechaHora, string? barbero, int? barberoId)
         {
-            var cita = new Cita();
+            var cita = new Cita
+{
+    FechaHora = DateTimeOffset.Now
+};
 
             if (fechaHora.HasValue)
             {
@@ -109,20 +112,25 @@ namespace OllinBarberApp.Controllers
             _context.Citas.Add(cita);
             _context.SaveChanges();
 
+            // Cargar Servicio y Barbero desde la base de datos
+            _context.Entry(cita)
+                .Reference(c => c.Servicio)
+                .Load();
+
+            _context.Entry(cita)
+                .Reference(c => c.BarberoEntidad)
+                .Load();
+
             PrepararConfirmacionWhatsApp(cita, servicio!, barbero);
 
-            TempData["Success"] = "Cita registrada correctamente.";
+            // Guardamos el enlace de WhatsApp para mostrarlo en la siguiente pantalla
+            ViewBag.WhatsAppUrl = TempData["WhatsAppUrl"]?.ToString();
 
-            var whatsappUrl = TempData["WhatsAppUrl"]?.ToString();
+            // Enviamos la cita a la vista de confirmación
+            return View("ReservaExitosa", cita);
 
-            if (!string.IsNullOrEmpty(whatsappUrl))
-            {
-                return Redirect(whatsappUrl);
-            }
-
-            return RedirectToAction("Agenda");
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Index(int? barberoId, string? barbero, DateTime? fecha)
         {
             var barberos = ObtenerBarberosPermitidos(disponibles: false);

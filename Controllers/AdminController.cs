@@ -123,87 +123,46 @@ namespace OllinBarberApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarBarbero(
-            Barbero barbero,
-            IFormFile? ImagenArchivo)
+    Barbero barbero,
+    IFormFile? ImagenArchivo)
         {
             if (!ModelState.IsValid)
             {
                 return View(barbero);
             }
 
-            var existente =
-                _context.Barberos.Find(barbero.Id);
+            var existente = await _context.Barberos
+                .FirstOrDefaultAsync(b => b.Id == barbero.Id);
 
             if (existente == null)
             {
                 return NotFound();
             }
 
-            existente.Nombre =
-                barbero.Nombre;
+            // Datos básicos
+            existente.Nombre = barbero.Nombre;
+            existente.Telefono = barbero.Telefono;
+            existente.Disponible = barbero.Disponible;
+            existente.Activo = barbero.Activo;
 
-            existente.Telefono =
-                barbero.Telefono;
-
-            existente.Disponible =
-                barbero.Disponible;
-
-            existente.Activo =
-                barbero.Activo;
-
-            if (ImagenArchivo != null &&
-                ImagenArchivo.Length > 0)
+            // Solo cambiar la imagen si realmente se seleccionó una nueva
+            if (ImagenArchivo != null && ImagenArchivo.Length > 0)
             {
-                existente.ImagenUrl =
-                    await GuardarImagen(
-                        ImagenArchivo,
-                        "barberos");
+                existente.ImagenUrl = await GuardarImagen(
+                    ImagenArchivo,
+                    "barberos");
             }
+
+            // Si NO se seleccionó imagen,
+            // se conserva la que ya tenía el barbero.
+
+            _context.Update(existente);
 
             await _context.SaveChangesAsync();
 
-            TempData["ok"] =
-                "Barbero actualizado";
+            TempData["ok"] = "Barbero actualizado correctamente.";
 
-            return RedirectToAction("Barberos");
-        }
-
-        public IActionResult EliminarBarbero(int id)
-        {
-            var barbero =
-                _context.Barberos.Find(id);
-
-            if (barbero != null)
-            {
-                barbero.Activo = false;
-                barbero.Disponible = false;
-
-                _context.SaveChanges();
-            }
-
-            TempData["ok"] =
-                "Barbero desactivado";
-
-            return RedirectToAction("Barberos");
-        }
-
-        public IActionResult ActivarBarbero(int id)
-        {
-            var barbero =
-                _context.Barberos.Find(id);
-
-            if (barbero != null)
-            {
-                barbero.Activo = true;
-                barbero.Disponible = true;
-
-                _context.SaveChanges();
-            }
-
-            TempData["ok"] =
-                "Barbero activado";
-
-            return RedirectToAction("Barberos");
+            return RedirectToAction(nameof(Barberos));
         }
 
         // =========================

@@ -194,6 +194,61 @@
             font-weight: bold;
         }
 
+
+    .birthday-title {
+        color: #d4af37;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+        .birthday-title i {
+            color: #f3d27a;
+        }
+
+    .birthday-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(212,175,55,.35);
+        border-radius: 50px;
+        color: #d4af37;
+        font-size: .75rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        background: rgba(212,175,55,.08);
+    }
+
+    .birthday-title {
+        color: #d4af37;
+        font-family: 'Playfair Display',serif;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+        .birthday-title i {
+            color: #f3d27a;
+        }
+
+    .birthday-divider {
+        width: 90px;
+        height: 3px;
+        margin: 18px auto 28px;
+        border-radius: 20px;
+        background: linear-gradient(90deg,#8b6a12,#d4af37,#f3d27a,#8b6a12);
+    }
+
+    .birthday-text {
+        color: #ececec;
+        font-size: 1.15rem;
+        line-height: 1.9;
+    }
+
+        .birthday-text strong {
+            color: #f3d27a;
+        }
+
 </style>
 
 <section class="hero">
@@ -238,17 +293,31 @@
             </a>
 
         </div>
-        
-            <div class="cumple-box">
 
-                <h3>🎂 Cumpleaños Ollin</h3>
+        <<div class="cumple-box">
 
-                <p>En Ollin Barber celebramos contigo.</p>
+            <div class="birthday-badge">
+                EXCLUSIVO PARA CLIENTES
+            </div>
 
-                <p>
-                    Regístrate y recibe un <strong>50% de descuento</strong>
-                    en cualquiera de nuestros servicios el día de tu cumpleaños.
-                </p>
+            <h3 class="birthday-title">
+                <i class="bi bi-gift-fill me-2"></i>
+                Cumpleaños VIP
+            </h3>
+
+            <div class="birthday-divider"></div>
+
+            <p class="birthday-text">
+                Porque tu estilo también merece celebrarse.
+            </p>
+
+            <p class="birthday-text">
+                En <strong>Ollin Barber</strong> te obsequiamos un
+                <strong>corte de cabello de cortesía</strong>
+                para que disfrutes tu día con la mejor imagen.
+            </p>
+
+        </div>
 
                 <a href="/Auth/Register" class="btn-registro">
                     Crear cuenta
