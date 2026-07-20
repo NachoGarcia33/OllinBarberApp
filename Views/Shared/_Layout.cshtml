@@ -339,12 +339,15 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="/Citas/Crear">
-                            Agendar
-                        </a>
-                    </li>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Barbero"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="/Citas/Agenda">
+                                Agenda
+                            </a>
+                        </li>
+                    }
 
                     <li class="nav-item">
                         <a class="nav-link"

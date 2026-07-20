@@ -327,20 +327,38 @@
             <div class="col-md-6">
 
                 <label class="form-label">
-                    Fecha y hora
+                    Fecha
                 </label>
 
-                <small class="text-warning">
-                    Horario de atención: 9:00 AM a 12:00PM -2:00PM a 7:30 PM
-                </small>
-
-                <input asp-for="FechaHora"
-                       type="datetime-local"
+                <input id="fecha"
+                       type="date"
                        class="form-control"
-                       min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
                        required />
 
             </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Hora
+                </label>
+
+                <small class="text-warning">
+                    Horario:
+                    9:00 AM - 12:00 PM /
+                    2:00 PM - 7:30 PM
+                </small>
+
+                <select id="hora"
+                        class="form-select"
+                        required>
+                </select>
+
+            </div>
+
+            <input asp-for="FechaHora"
+                   id="fechaHora"
+                   type="hidden" />
 
             <div class="col-md-6">
 
@@ -475,5 +493,117 @@
             }
 
         });
+
+           //-----------------------------------------------------
+    // Fecha
+    //-----------------------------------------------------
+
+    const fecha = document.getElementById("fecha");
+
+    const hora = document.getElementById("hora");
+
+    const fechaHora = document.getElementById("fechaHora");
+
+    const ahora = new Date();
+
+    fecha.min = ahora.toISOString().split("T")[0];
+
+    fecha.value = ahora.toISOString().split("T")[0];
+
+
+    //------------------------------------------
+    // Horarios permitidos
+    //------------------------------------------
+
+    const horarios = [
+
+    "09:00",
+    "09:30",
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
+
+    "14:00",
+    "14:30",
+    "15:00",
+    "15:30",
+    "16:00",
+    "16:30",
+    "17:00",
+    "17:30",
+    "18:00",
+    "18:30",
+    "19:00",
+    "19:30"
+
+    ];
+
+
+    //------------------------------------------
+    // Llenar Horas
+    //------------------------------------------
+
+    function cargarHoras(){
+
+        hora.innerHTML="";
+
+        const hoy = fecha.value;
+
+        const hoyReal = ahora.toISOString().split("T")[0];
+
+        horarios.forEach(h=>{
+
+            if(hoy===hoyReal){
+
+                const partes=h.split(":");
+
+                const fechaTemporal=new Date();
+
+                fechaTemporal.setHours(partes[0]);
+
+                fechaTemporal.setMinutes(partes[1]);
+
+                if(fechaTemporal<=new Date()){
+
+                    return;
+
+                }
+
+            }
+
+            const option=document.createElement("option");
+
+            option.value=h;
+
+            option.text=h;
+
+            hora.appendChild(option);
+
+        });
+
+        actualizarFechaHora();
+
+    }
+
+    function actualizarFechaHora(){
+
+        fechaHora.value=fecha.value+"T"+hora.value;
+
+    }
+
+    fecha.addEventListener("change",()=>{
+
+        cargarHoras();
+
+    });
+
+    hora.addEventListener("change",()=>{
+
+        actualizarFechaHora();
+
+    });
+
+    cargarHoras();
 
 </script>

@@ -249,6 +249,30 @@
             color: #f3d27a;
         }
 
+    /*=========================================
+      PRUEBA SOCIAL
+    ==========================================*/
+
+    .hero-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 45px;
+        padding: 12px 22px;
+        border-radius: 50px;
+        background: rgba(212,175,55,.08);
+        border: 1px solid rgba(212,175,55,.20);
+        color: #f3d27a;
+        font-size: 1rem;
+        font-weight: 600;
+        backdrop-filter: blur(12px);
+        animation: fadeLuxury 2.2s ease;
+    }
+
+        .hero-rating strong {
+            color: white;
+        }
+
 </style>
 
 <section class="hero">
@@ -269,32 +293,42 @@
 
         </p>
 
+        <div class="hero-rating">
+
+            ★★★★★
+
+            <span>
+                Más de <strong>2.500 clientes satisfechos</strong>
+            </span>
+
+        </div>
+
         <div class="botones">
 
             <a href="/Citas/Crear"
                class="btn-barber">
 
-                Agendar Cita
-
-            </a>
-
-            <a href="/Citas/Agenda"
-               class="btn-barber">
-
-                Ver Agenda
+                Reservar Ahora
 
             </a>
 
             <a href="/Servicios"
                class="btn-barber">
 
-                Servicios
+                Nuestros Servicios
+
+            </a>
+
+            <a href="/Barberos"
+               class="btn-barber">
+
+                Conoce al Equipo
 
             </a>
 
         </div>
 
-        <<div class="cumple-box">
+        <div class="cumple-box">
 
             <div class="birthday-badge">
                 EXCLUSIVO PARA CLIENTES
@@ -319,16 +353,17 @@
 
         </div>
 
-                <a href="/Auth/Register" class="btn-registro">
-                    Crear cuenta
-                </a>
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <a href="/Auth/Register" class="btn-registro">
+                Crear cuenta
+            </a>
 
-                <div class="login-texto">
-                    ¿Ya tienes cuenta?
-                    <a href="/Auth/Login">Inicia sesión</a>
-                </div>
-
+            <div class="login-texto">
+                ¿Ya tienes cuenta?
+                <a href="/Auth/Login">Inicia sesión</a>
             </div>
+        }
         
     </div>
 
