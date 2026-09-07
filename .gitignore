@@ -4,3 +4,8 @@ obj/
 *.user
 *.suo
 *.db
+.env
+.env.*
+!.env.example
+appsettings.Production.json
+secrets.json

@@ -1,39 +1,38 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using OllinBarberApp.Data;
 using OllinBarberApp.Models;
 using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-
-
-AppContext.SetSwitch(
-    "Npgsql.EnableLegacyTimestampBehavior",
-    true
-);
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString =
-    Environment.GetEnvironmentVariable("DATABASE_URL")
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "No hay conexión a base de datos configurada. Define DATABASE_URL o ConnectionStrings:DefaultConnection mediante variables de entorno/user-secrets.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Contrase�as
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 8;
 
-    // Bloqueo por intentos fallidos
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
+
+    options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
@@ -41,6 +40,26 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccesoDenegado";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.SlidingExpiration = true;
+});
+
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".OllinBarber.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.IdleTimeout = TimeSpan.FromDays(7);
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 builder.Services.AddControllersWithViews();
@@ -53,21 +72,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var db = services.GetRequiredService<ApplicationDbContext>();
 
-    try
-    {
-        Console.WriteLine("Aplicando migraciones...");
-
-        await db.Database.MigrateAsync();
-
-        NormalizarConfiguracionSistema(db);
-
-        Console.WriteLine("Migraciones aplicadas correctamente.");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.ToString());
-        throw;
-    }
+    await db.Database.MigrateAsync();
+    AsegurarConfiguracionSistema(db);
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
@@ -80,38 +86,42 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    var adminEmail =
-    Environment.GetEnvironmentVariable("ADMIN_EMAIL")
-    ?? "pedro88hernandez13@gmail.com";
-    var admin = await userManager.FindByEmailAsync(adminEmail);
+    // El administrador inicial solo se crea si las credenciales fueron entregadas
+    // explícitamente por entorno. Nunca se usa una contraseña de respaldo hardcodeada.
+    var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+    var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD");
 
-    if (admin == null)
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
     {
-        var user = new ApplicationUser
+        var admin = await userManager.FindByEmailAsync(adminEmail);
+        if (admin == null)
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            Nombre = "Pedro Hernandez",
-            Celular = "3045580585",
-            EsBarbero = false,
-            Disponible = true
-        };
+            var user = new ApplicationUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                Nombre = Environment.GetEnvironmentVariable("ADMIN_NAME") ?? "Administrador",
+                Celular = Environment.GetEnvironmentVariable("ADMIN_PHONE") ?? "3000000000",
+                EsBarbero = false,
+                Disponible = true
+            };
 
-        var adminPassword =
-            Environment.GetEnvironmentVariable("ADMIN_PASSWORD")
-            ?? "PedroBarber2026!";
-        var result = await userManager.CreateAsync(
-    user,
-    adminPassword
-);
+            var result = await userManager.CreateAsync(user, adminPassword);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "No se pudo crear el administrador inicial: " +
+                    string.Join("; ", result.Errors.Select(e => e.Description)));
+            }
 
-        if (result.Succeeded)
-        {
             await userManager.AddToRoleAsync(user, "Admin");
         }
     }
 }
-    if (!app.Environment.IsDevelopment())
+
+app.UseForwardedHeaders();
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -122,32 +132,33 @@ else
 }
 
 var cultura = new CultureInfo("es-CO");
-
 CultureInfo.DefaultThreadCurrentCulture = cultura;
 CultureInfo.DefaultThreadCurrentUICulture = cultura;
 
-app.UseRequestLocalization(
-    new RequestLocalizationOptions
-    {
-        DefaultRequestCulture =
-            new RequestCulture("es-CO"),
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("es-CO"),
+    SupportedCultures = new[] { cultura },
+    SupportedUICultures = new[] { cultura }
+});
 
-        SupportedCultures =
-            new[] { cultura },
-
-        SupportedUICultures =
-            new[] { cultura }
-    });
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    await next();
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-var uploadsPath = Path.Combine(builder.Environment.WebRootPath, "uploads");
 
-if (!Directory.Exists(uploadsPath))
-{
-    Directory.CreateDirectory(uploadsPath);
-}
+var uploadsPath = Path.Combine(builder.Environment.WebRootPath, "uploads");
+Directory.CreateDirectory(uploadsPath);
+
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -156,27 +167,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
 app.Run();
 
-static void NormalizarConfiguracionSistema(ApplicationDbContext db)
+static void AsegurarConfiguracionSistema(ApplicationDbContext db)
 {
-    var configuraciones = db.ConfiguracionSistema
-        .OrderByDescending(c => c.Id)
-        .ToList();
-
-    if (!configuraciones.Any())
+    if (!db.ConfiguracionSistema.Any())
     {
         db.ConfiguracionSistema.Add(new ConfiguracionSistema());
-        db.SaveChanges();
-        return;
-    }
-
-    var duplicadas = configuraciones.Skip(1).ToList();
-
-    if (duplicadas.Any())
-    {
-        db.ConfiguracionSistema.RemoveRange(duplicadas);
         db.SaveChanges();
     }
 }
