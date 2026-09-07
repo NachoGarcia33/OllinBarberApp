@@ -8,13 +8,13 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration
+    .GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
-        "No hay conexión a base de datos configurada. Define DATABASE_URL o ConnectionStrings:DefaultConnection mediante variables de entorno/user-secrets.");
+        "No se encontró la cadena de conexión 'DefaultConnection'.");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
