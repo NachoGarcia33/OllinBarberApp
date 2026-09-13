@@ -8,8 +8,8 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
