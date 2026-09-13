@@ -1,0 +1,23 @@
+@model List<OllinBarberApp.Models.Pedido>
+@{
+    ViewData["Title"] = "Mis pedidos";
+}
+<section class="store-shell">
+    <div class="store-hero"><div><h1 class="store-title">Mis pedidos</h1><p class="store-muted mb-0">Historial asociado a tu cuenta.</p></div><a asp-action="Index" class="btn-store-outline">Tienda</a></div>
+    @if (!Model.Any())
+    {
+        <div class="empty-store"><h2 class="h4 text-warning">Aún no tienes pedidos</h2><a asp-action="Index" class="btn-store">Ver productos</a></div>
+    }
+    else
+    {
+        <div class="d-grid gap-3">
+        @foreach (var pedido in Model)
+        {
+            <div class="order-card d-flex justify-content-between gap-3 flex-wrap align-items-center">
+                <div><strong class="text-warning">@pedido.Codigo</strong><div class="store-muted small">@pedido.Fecha.ToOffset(TimeSpan.FromHours(-5)).ToString("dd/MM/yyyy HH:mm") · @pedido.Detalles.Sum(d => d.Cantidad) artículo(s)</div></div>
+                <div><span class="order-status me-2">@pedido.Estado</span><strong>@pedido.Total.ToString("C0")</strong></div>
+            </div>
+        }
+        </div>
+    }
+</section>

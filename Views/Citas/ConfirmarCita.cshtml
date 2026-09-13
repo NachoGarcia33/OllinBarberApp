@@ -1,0 +1,31 @@
+@model OllinBarberApp.Models.Cita
+@using OllinBarberApp.Models
+@{ ViewData["Title"] = "Confirmar cita"; var fecha = Model.FechaHora.ToOffset(TimeSpan.FromHours(-5)); }
+<section class="store-shell" style="max-width:720px">
+    <div class="order-card text-center">
+        <h1 class="store-title h2">Confirmar cita</h1>
+        <p class="store-muted">Revisa la reserva antes de confirmarla.</p>
+        <div class="mt-4">
+            <strong>@Model.ClienteNombre</strong>
+            <div>@Model.Servicio?.Nombre</div>
+            <div class="text-warning">@fecha.ToString("dd/MM/yyyy · hh:mm tt")</div>
+            <div>@(Model.BarberoEntidad?.Nombre ?? Model.Barbero)</div>
+        </div>
+
+        @if (Model.Estado == EstadoCita.Pendiente)
+        {
+            <form asp-action="Confirmar" method="post" class="mt-4">
+                <input type="hidden" name="token" value="@Model.TokenConfirmacion" />
+                <button type="submit" class="btn-store">Confirmar esta cita</button>
+            </form>
+        }
+        else if (Model.Estado == EstadoCita.Confirmada)
+        {
+            <div class="alert alert-success mt-4 mb-0">Esta cita ya está confirmada.</div>
+        }
+        else
+        {
+            <div class="alert alert-secondary mt-4 mb-0">Esta cita se encuentra en estado <strong>@Model.Estado</strong> y ya no puede confirmarse desde este enlace.</div>
+        }
+    </div>
+</section>

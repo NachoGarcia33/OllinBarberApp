@@ -1,0 +1,105 @@
+@model List<OllinBarberApp.Models.Producto>
+@{
+    ViewData["Title"] = "Tienda";
+    var categorias = ViewBag.Categorias as List<string> ?? new();
+    var marcas = ViewBag.Marcas as List<string> ?? new();
+    string? q = ViewBag.Q;
+    string? categoria = ViewBag.Categoria;
+    string? marca = ViewBag.Marca;
+    string? orden = ViewBag.Orden;
+}
+
+<section class="store-shell">
+    <div class="store-hero">
+        <div>
+            <h1 class="store-title">Tienda Ollin Barber</h1>
+            <p class="store-muted mb-0">Productos disponibles con inventario actualizado.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-action="Seguimiento" class="btn-store-outline">Seguir pedido</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-action="MisPedidos" class="btn-store-outline">Mis pedidos</a>
+            }
+            <a asp-action="Carrito" class="btn-store">Carrito (@ViewBag.CarritoCantidad)</a>
+        </div>
+    </div>
+
+    <form method="get" class="store-toolbar" aria-label="Filtros de tienda">
+        <input type="search" name="q" value="@q" class="form-control" placeholder="Buscar producto, marca o categoría" aria-label="Buscar productos" />
+        <select name="categoria" class="form-select" aria-label="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+            @foreach (var item in categorias)
+            {
+                <option value="@item" selected="@(categoria == item)">@item</option>
+            }
+        </select>
+        <select name="marca" class="form-select" aria-label="Filtrar por marca">
+            <option value="">Todas las marcas</option>
+            @foreach (var item in marcas)
+            {
+                <option value="@item" selected="@(marca == item)">@item</option>
+            }
+        </select>
+        <select name="orden" class="form-select" aria-label="Ordenar productos" onchange="this.form.submit()">
+            <option value="" selected="@(string.IsNullOrWhiteSpace(orden))">Relevancia</option>
+            <option value="precio-asc" selected="@(orden == "precio-asc")">Precio: menor a mayor</option>
+            <option value="precio-desc" selected="@(orden == "precio-desc")">Precio: mayor a menor</option>
+            <option value="nombre-desc" selected="@(orden == "nombre-desc")">Nombre Z–A</option>
+        </select>
+        <button class="btn-store" type="submit">Aplicar filtros</button>
+        <a asp-action="Index" class="btn-store-outline">Limpiar</a>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-store">
+            <h2 class="h4 text-warning">No encontramos productos</h2>
+            <p class="store-muted">Prueba con otros filtros o términos de búsqueda.</p>
+            <a asp-action="Index" class="btn-store-outline">Ver todo el catálogo</a>
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
+            @foreach (var producto in Model)
+            {
+                var imagen = string.IsNullOrWhiteSpace(producto.ImagenUrl) ? "/images/logo.png" : producto.ImagenUrl;
+                <article class="product-card">
+                    <a asp-action="Detalle" asp-route-id="@producto.Id" class="text-decoration-none text-white">
+                        <div class="product-image-wrap">
+                            <img src="@imagen" alt="@producto.Nombre" loading="lazy" />
+                            @if (producto.DescuentoPorcentaje > 0)
+                            {
+                                <span class="discount-badge">-@producto.DescuentoPorcentaje.ToString("0")%</span>
+                            }
+                        </div>
+                    </a>
+                    <div class="product-body">
+                        <div class="product-meta">@producto.Categoria@(string.IsNullOrWhiteSpace(producto.Marca) ? "" : $" · {producto.Marca}")</div>
+                        <h2 class="h5 mb-0"><a asp-action="Detalle" asp-route-id="@producto.Id" class="text-white text-decoration-none">@producto.Nombre</a></h2>
+                        <p class="store-muted small mb-0">@producto.Descripcion</p>
+                        <div class="mt-auto">
+                            @if (producto.DescuentoPorcentaje > 0)
+                            {
+                                <span class="product-old-price me-2">@producto.Precio.ToString("C0")</span>
+                            }
+                            <div class="product-price">@producto.PrecioFinal.ToString("C0")</div>
+                            <div class="small @(producto.Stock > 0 ? "stock-ok" : "stock-out") mb-2">
+                                @(producto.Stock > 0 ? $"Disponible · {producto.Stock} unidad(es)" : "Producto agotado")
+                            </div>
+                            <form asp-action="Agregar" method="post">
+                                <input type="hidden" name="productoId" value="@producto.Id" />
+                                <input type="hidden" name="cantidad" value="1" />
+                                <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                <button type="submit" class="btn-store w-100" disabled="@(producto.Stock <= 0)">
+                                    @(producto.Stock > 0 ? "Agregar al carrito" : "Agotado")
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

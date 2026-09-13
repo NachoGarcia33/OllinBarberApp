@@ -1,0 +1,34 @@
+@model OllinBarberApp.Models.Pedido
+@{
+    ViewData["Title"] = "Pedido confirmado";
+}
+<section class="store-shell">
+    <div class="order-card text-center mb-3">
+        <div class="display-6 text-success mb-2">✓</div>
+        <h1 class="store-title h2">Pedido recibido</h1>
+        <p class="store-muted">Tu pedido fue registrado correctamente. Conserva este código para seguimiento.</p>
+        <div class="h3 text-warning">@Model.Codigo</div>
+        <span class="order-status">@Model.Estado</span>
+    </div>
+    <div class="checkout-grid">
+        <div class="order-card">
+            <h2 class="h5 text-warning">Productos</h2>
+            @foreach (var item in Model.Detalles)
+            {
+                <div class="summary-line"><span>@item.Cantidad × @(item.Producto?.Nombre ?? $"Producto #{item.ProductoId}")</span><strong>@item.Subtotal.ToString("C0")</strong></div>
+            }
+            <div class="summary-line summary-total"><span>Total</span><span>@Model.Total.ToString("C0")</span></div>
+        </div>
+        <div class="order-card">
+            <h2 class="h5 text-warning">Entrega</h2>
+            <p class="mb-1"><strong>@Model.ClienteNombre</strong></p>
+            <p class="store-muted mb-1">@Model.Direccion · @Model.Ciudad</p>
+            <p class="store-muted mb-1">@Model.Telefono · @Model.Email</p>
+            <p class="store-muted mb-0">@Model.MetodoEntrega · @Model.MetodoPago</p>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+        <a asp-action="Seguimiento" class="btn-store-outline">Seguimiento</a>
+        <a asp-action="Index" class="btn-store">Volver a la tienda</a>
+    </div>
+</section>

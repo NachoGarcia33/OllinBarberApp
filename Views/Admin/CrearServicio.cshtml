@@ -1,0 +1,52 @@
+@model OllinBarberApp.Models.Servicio
+
+@{ ViewData["Title"] = "Nuevo servicio"; }
+<section class="container py-4" style="max-width:680px;">
+    <h1 class="mb-3" style="color:#d4af37;">Nuevo servicio</h1>
+
+    <form method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label">Nombre</label>
+            <input asp-for="Nombre" class="form-control" autocomplete="off" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Duracion" class="form-label">Duración en minutos</label>
+            <input asp-for="Duracion" type="number" min="1" max="480" class="form-control" />
+            <span asp-validation-for="Duracion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Precio" class="form-label">Precio</label>
+            <input asp-for="Precio" type="number" min="0" step="1" class="form-control" />
+            <span asp-validation-for="Precio" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Tipo" class="form-label">Tipo</label>
+            <input asp-for="Tipo" class="form-control" placeholder="Principal, complementario, combo..." />
+            <span asp-validation-for="Tipo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-warning" for="ImagenArchivo">Imagen del servicio</label>
+            <input id="ImagenArchivo" type="file" name="ImagenArchivo" class="form-control" accept="image/jpeg,image/png,image/webp" />
+            @Html.ValidationMessage("ImagenArchivo", new { @class = "text-danger" })
+            <div class="form-text text-white-50">JPG, PNG o WEBP. Máximo 5 MB.</div>
+        </div>
+
+        <div class="form-check mb-4">
+            <input class="form-check-input" asp-for="Activo" />
+            <label class="form-check-label" asp-for="Activo">Activo</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning fw-bold w-100">Guardar servicio</button>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

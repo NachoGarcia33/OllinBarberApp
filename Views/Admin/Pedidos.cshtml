@@ -1,0 +1,14 @@
+@model List<OllinBarberApp.Models.Pedido>
+@using OllinBarberApp.Models
+@{ ViewData["Title"] = "Pedidos de tienda"; EstadoPedido? estado = ViewBag.Estado; }
+<section class="container py-4">
+    <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap mb-4">
+        <div><h1 class="m-0" style="color:#d4af37;">Pedidos de tienda</h1><p class="text-white-50 mb-0">Gestión del flujo de pedidos y entrega.</p></div>
+        <form method="get" class="d-flex gap-2"><select name="estado" class="form-select"><option value="">Todos los estados</option>@foreach(var e in Enum.GetValues<EstadoPedido>()){<option value="@e" selected="@(estado==e)">@e</option>}</select><button class="btn btn-warning">Filtrar</button></form>
+    </div>
+    @if(!Model.Any()) { <div class="alert alert-dark border-warning text-warning">No hay pedidos para este filtro.</div> }
+    else {
+    <div class="table-responsive"><table class="table table-dark table-hover align-middle"><thead><tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Items</th><th>Total</th><th></th></tr></thead><tbody>
+    @foreach(var pedido in Model){<tr><td class="text-warning fw-bold">@pedido.Codigo</td><td>@pedido.ClienteNombre<div class="small text-white-50">@pedido.Telefono</div></td><td>@pedido.Fecha.ToOffset(TimeSpan.FromHours(-5)).ToString("dd/MM/yyyy HH:mm")</td><td><span class="badge text-bg-secondary">@pedido.Estado</span></td><td>@pedido.Detalles.Sum(d=>d.Cantidad)</td><td class="fw-bold">@pedido.Total.ToString("C0")</td><td><a asp-action="Pedido" asp-route-id="@pedido.Id" class="btn btn-sm btn-outline-warning">Ver pedido</a></td></tr>}
+    </tbody></table></div>}
+</section>

@@ -1,0 +1,27 @@
+@model OllinBarberApp.Models.Producto
+@{ ViewData["Title"] = "Editar producto"; }
+<section class="container py-4" style="max-width:820px;">
+    <h1 class="mb-3" style="color:#d4af37;">Editar producto</h1>
+    <form method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="row g-3">
+            <div class="col-md-7"><label asp-for="Nombre" class="form-label"></label><input asp-for="Nombre" class="form-control" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
+            <div class="col-md-5"><label asp-for="Marca" class="form-label"></label><input asp-for="Marca" class="form-control" /><span asp-validation-for="Marca" class="text-danger"></span></div>
+            <div class="col-md-6"><label asp-for="Categoria" class="form-label"></label><input asp-for="Categoria" class="form-control" /><span asp-validation-for="Categoria" class="text-danger"></span></div>
+            <div class="col-md-6"><label asp-for="Stock" class="form-label"></label><input asp-for="Stock" type="number" min="0" class="form-control" /><span asp-validation-for="Stock" class="text-danger"></span></div>
+            <div class="col-md-6"><label asp-for="Precio" class="form-label"></label><input asp-for="Precio" type="number" min="1" step="100" class="form-control" /><span asp-validation-for="Precio" class="text-danger"></span></div>
+            <div class="col-md-6"><label asp-for="DescuentoPorcentaje" class="form-label">Descuento (%)</label><input asp-for="DescuentoPorcentaje" type="number" min="0" max="100" class="form-control" /><span asp-validation-for="DescuentoPorcentaje" class="text-danger"></span></div>
+            <div class="col-12"><label asp-for="Descripcion" class="form-label"></label><textarea asp-for="Descripcion" class="form-control" rows="3"></textarea><span asp-validation-for="Descripcion" class="text-danger"></span></div>
+            @if (!string.IsNullOrWhiteSpace(Model.ImagenUrl))
+            {
+                <div class="col-12"><img src="@Model.ImagenUrl" alt="Imagen actual de @Model.Nombre" style="width:120px;height:90px;object-fit:cover;border-radius:10px" /></div>
+            }
+            <div class="col-12"><label class="form-label" for="ImagenArchivo">Reemplazar imagen</label><input id="ImagenArchivo" type="file" name="ImagenArchivo" class="form-control" accept="image/jpeg,image/png,image/webp" />@Html.ValidationMessage("ImagenArchivo", new { @class = "text-danger d-block" })
+            <div class="form-text text-light">Déjalo vacío para conservar la imagen actual. Máximo 5 MB.</div></div>
+            <div class="col-12"><div class="form-check"><input class="form-check-input" asp-for="Activo" /><label class="form-check-label" asp-for="Activo">Activo en catálogo</label></div></div>
+        </div>
+        <div class="d-flex gap-2 mt-4"><button class="btn btn-warning fw-bold" type="submit">Guardar cambios</button><a asp-action="Productos" class="btn btn-outline-light">Cancelar</a></div>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

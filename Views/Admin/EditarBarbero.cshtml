@@ -1,0 +1,40 @@
+@model OllinBarberApp.Models.Barbero
+@{ ViewData["Title"] = "Editar barbero"; bool tieneAcceso = ViewBag.TieneAcceso == true; }
+<section class="container py-4" style="max-width:720px;">
+    <h1 class="mb-3 text-warning">Editar barbero</h1>
+    <form asp-action="EditarBarbero" method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="mb-3"><label asp-for="Nombre" class="form-label text-light"></label><input asp-for="Nombre" class="form-control" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="Telefono" class="form-label text-light">Teléfono</label><input asp-for="Telefono" class="form-control" inputmode="numeric" /><span asp-validation-for="Telefono" class="text-danger"></span></div>
+        <div class="mb-3"><label class="form-label text-light" for="ImagenArchivo">Cambiar imagen</label><input id="ImagenArchivo" type="file" name="ImagenArchivo" class="form-control" accept="image/jpeg,image/png,image/webp" />@Html.ValidationMessage("ImagenArchivo", new { @class = "text-danger d-block" })
+            <div class="form-text text-light">JPG, PNG o WEBP. Máximo 5 MB.</div></div>
+        @if (!string.IsNullOrEmpty(Model.ImagenUrl)) { <div class="mb-3 text-center"><img src="@Model.ImagenUrl" alt="Foto de @Model.Nombre" style="width:180px;height:180px;object-fit:cover;border-radius:12px;border:3px solid #d4af37;" /></div> }
+        <div class="form-check mb-2"><input class="form-check-input" asp-for="Disponible" /><label class="form-check-label text-light" asp-for="Disponible"></label></div>
+        <div class="form-check mb-4"><input class="form-check-input" asp-for="Activo" /><label class="form-check-label text-light" asp-for="Activo"></label></div>
+        <button type="submit" class="btn btn-warning fw-bold w-100">Guardar cambios</button>
+    </form>
+
+    <div class="bg-dark border border-secondary rounded p-4 mt-4">
+        <h2 class="h5 text-warning">Acceso al panel de barbero</h2>
+        @if (tieneAcceso)
+        {
+            <p class="text-white-50">Este barbero ya tiene un acceso con permisos de Barbero.</p>
+            <form asp-action="RevocarAccesoBarbero" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-danger">Revocar permiso de barbero</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-white-50">Crea una cuenta para que gestione únicamente su propia agenda.</p>
+            <form asp-action="CrearAccesoBarbero" method="post" class="row g-3">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="col-md-6"><label class="form-label" for="email">Correo</label><input id="email" name="email" type="email" class="form-control" required autocomplete="off" /></div>
+                <div class="col-md-6"><label class="form-label" for="password">Contraseña inicial</label><input id="password" name="password" type="password" class="form-control" required minlength="8" autocomplete="new-password" /></div>
+                <div class="col-12"><button type="submit" class="btn btn-outline-warning">Crear acceso Barbero</button></div>
+            </form>
+        }
+    </div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

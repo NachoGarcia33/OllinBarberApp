@@ -1,0 +1,39 @@
+@model OllinBarberApp.Models.Producto
+@{
+    ViewData["Title"] = Model.Nombre;
+    var imagen = string.IsNullOrWhiteSpace(Model.ImagenUrl) ? "/images/logo.png" : Model.ImagenUrl;
+}
+<section class="store-shell">
+    <div class="mb-3"><a asp-action="Index" class="btn-store-outline">← Volver al catálogo</a></div>
+    <div class="product-detail">
+        <div class="product-image-wrap">
+            <img src="@imagen" alt="@Model.Nombre" class="product-detail-image" />
+            @if (Model.DescuentoPorcentaje > 0)
+            {
+                <span class="discount-badge">-@Model.DescuentoPorcentaje.ToString("0")%</span>
+            }
+        </div>
+        <div class="checkout-card">
+            <div class="product-meta">@Model.Categoria@(string.IsNullOrWhiteSpace(Model.Marca) ? "" : $" · {Model.Marca}")</div>
+            <h1 class="store-title h2 mt-2">@Model.Nombre</h1>
+            <p class="store-muted">@Model.Descripcion</p>
+            @if (Model.DescuentoPorcentaje > 0)
+            {
+                <div class="product-old-price">@Model.Precio.ToString("C0")</div>
+            }
+            <div class="product-price mb-2">@Model.PrecioFinal.ToString("C0")</div>
+            <p class="@(Model.Stock > 0 ? "stock-ok" : "stock-out")">
+                @(Model.Stock > 0 ? $"{Model.Stock} unidad(es) disponibles" : "Producto agotado")
+            </p>
+            <form asp-action="Agregar" method="post" class="d-flex gap-2 flex-wrap align-items-end">
+                <input type="hidden" name="productoId" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                <div>
+                    <label class="form-label" for="cantidad">Cantidad</label>
+                    <input id="cantidad" name="cantidad" type="number" min="1" max="@Math.Max(Model.Stock, 1)" value="1" class="form-control" style="max-width:120px" disabled="@(Model.Stock <= 0)" />
+                </div>
+                <button class="btn-store" type="submit" disabled="@(Model.Stock <= 0)">@(Model.Stock > 0 ? "Agregar al carrito" : "Agotado")</button>
+            </form>
+        </div>
+    </div>
+</section>

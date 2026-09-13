@@ -1,0 +1,22 @@
+@model List<OllinBarberApp.Models.Barbero>
+@{ ViewData["Title"] = "Nuestro equipo"; }
+<section class="store-shell">
+    <div class="text-center mb-4"><h1 class="store-title">Nuestro equipo</h1><p class="store-muted">Conoce a los barberos activos y reserva con el profesional que prefieras.</p></div>
+    @if(!Model.Any())
+    {
+        <div class="empty-store">No hay barberos activos en este momento.</div>
+    }
+    else
+    {
+        <div class="product-grid">
+        @foreach(var barbero in Model)
+        {
+            var imagen = string.IsNullOrWhiteSpace(barbero.ImagenUrl) ? "/images/logo.png" : barbero.ImagenUrl;
+            <article class="product-card">
+                <img src="@imagen" alt="@barbero.Nombre" loading="lazy" />
+                <div class="product-body text-center"><h2 class="h5">@barbero.Nombre</h2><div class="@(barbero.Disponible ? "stock-ok" : "store-muted")">@(barbero.Disponible ? "Disponible para reservas" : "No disponible temporalmente")</div>@if(barbero.Disponible){<a asp-controller="Citas" asp-action="Crear" asp-route-barberoId="@barbero.Id" class="btn-store text-decoration-none mt-2">Reservar</a>}</div>
+            </article>
+        }
+        </div>
+    }
+</section>

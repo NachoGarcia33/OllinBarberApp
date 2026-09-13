@@ -1,0 +1,58 @@
+@model OllinBarberApp.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    var pagos = ViewBag.MetodosPago as string[] ?? Array.Empty<string>();
+    var entregas = ViewBag.MetodosEntrega as string[] ?? Array.Empty<string>();
+}
+<section class="store-shell">
+    <div class="store-hero">
+        <div>
+            <h1 class="store-title">Finalizar pedido</h1>
+            <p class="store-muted mb-0">Revisa tus datos. El stock y los precios se validan nuevamente al confirmar.</p>
+        </div>
+        <a asp-action="Carrito" class="btn-store-outline">← Volver al carrito</a>
+    </div>
+
+    <form asp-action="Checkout" method="post" class="checkout-grid">
+        <div class="checkout-card">
+            <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+            <h2 class="h5 text-warning mb-3">Datos del cliente</h2>
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="ClienteNombre" class="form-label"></label><input asp-for="ClienteNombre" class="form-control" autocomplete="name" /><span asp-validation-for="ClienteNombre"></span></div>
+                <div class="col-md-6"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" autocomplete="email" /><span asp-validation-for="Email"></span></div>
+                <div class="col-md-6"><label asp-for="Telefono" class="form-label"></label><input asp-for="Telefono" class="form-control" inputmode="numeric" autocomplete="tel" /><span asp-validation-for="Telefono"></span></div>
+                <div class="col-md-6"><label asp-for="Ciudad" class="form-label"></label><input asp-for="Ciudad" class="form-control" autocomplete="address-level2" /><span asp-validation-for="Ciudad"></span></div>
+                <div class="col-12"><label asp-for="Direccion" class="form-label"></label><input asp-for="Direccion" class="form-control" autocomplete="street-address" /><span asp-validation-for="Direccion"></span></div>
+                <div class="col-md-6">
+                    <label asp-for="MetodoPago" class="form-label">Método de pago</label>
+                    <select asp-for="MetodoPago" class="form-select">
+                        @foreach (var item in pagos) { <option value="@item">@item</option> }
+                    </select><span asp-validation-for="MetodoPago"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetodoEntrega" class="form-label">Método de entrega</label>
+                    <select asp-for="MetodoEntrega" class="form-select">
+                        @foreach (var item in entregas) { <option value="@item">@item</option> }
+                    </select><span asp-validation-for="MetodoEntrega"></span>
+                </div>
+                <div class="col-12"><label asp-for="Notas" class="form-label">Notas (opcional)</label><textarea asp-for="Notas" class="form-control" rows="3"></textarea><span asp-validation-for="Notas"></span></div>
+            </div>
+            <div class="alert alert-dark border-secondary mt-3 mb-0 small">
+                El pedido queda <strong>pendiente de confirmación</strong>. Esta aplicación no simula un cobro en línea: el pago se coordina según el método elegido.
+            </div>
+        </div>
+
+        <aside class="checkout-card h-fit">
+            <h2 class="h5 text-warning">Resumen</h2>
+            @foreach (var item in Model.Carrito.Items)
+            {
+                <div class="summary-line small"><span>@item.Cantidad × @item.Producto.Nombre</span><span>@item.Subtotal.ToString("C0")</span></div>
+            }
+            <div class="summary-line"><span>Subtotal</span><strong>@Model.Carrito.Subtotal.ToString("C0")</strong></div>
+            <div class="summary-line"><span>Descuentos</span><strong class="text-success">-@Model.Carrito.DescuentoTotal.ToString("C0")</strong></div>
+            <div class="summary-line summary-total"><span>Total</span><span>@Model.Carrito.Total.ToString("C0")</span></div>
+            <button type="submit" class="btn-store w-100 mt-3">Confirmar pedido</button>
+        </aside>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

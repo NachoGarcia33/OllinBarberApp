@@ -1,0 +1,45 @@
+@model OllinBarberApp.Models.Barbero
+
+@{ ViewData["Title"] = "Nuevo barbero"; }
+<section class="container py-4" style="max-width:680px;">
+    <h1 class="mb-3" style="color:#d4af37;">Nuevo barbero</h1>
+
+    <form method="post" enctype="multipart/form-data" class="bg-dark border border-warning rounded p-4">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label text-warning">Nombre</label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Telefono" class="form-label text-warning">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" inputmode="numeric" autocomplete="tel" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-warning" for="ImagenArchivo">Imagen del barbero</label>
+            <input id="ImagenArchivo" type="file" name="ImagenArchivo" class="form-control" accept="image/jpeg,image/png,image/webp" />
+            @Html.ValidationMessage("ImagenArchivo", new { @class = "text-danger" })
+            <div class="form-text text-white-50">JPG, PNG o WEBP. Máximo 5 MB.</div>
+        </div>
+
+        <div class="form-check mb-2">
+            <input class="form-check-input" asp-for="Disponible" />
+            <label class="form-check-label" asp-for="Disponible">Disponible</label>
+        </div>
+
+        <div class="form-check mb-4">
+            <input class="form-check-input" asp-for="Activo" />
+            <label class="form-check-label" asp-for="Activo">Activo</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning fw-bold w-100">Guardar barbero</button>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

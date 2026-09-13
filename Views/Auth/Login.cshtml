@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <div class="text-center mb-4">
+
+            <img src="~/images/logo.png"
+                 alt="Ollin Barber"
+                 class="logo-login" />
+
+            <h1 class="titulo-premium">
+                Ollin Barber
+            </h1>
+
+            <p class="subtitulo-premium">
+                Accede a tu cuenta
+            </p>
+
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["Success"]
+            </div>
+        }
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Correo electrónico
+                </label>
+
+                <input name="email"
+                       type="email"
+                       class="form-control input-premium"
+                       placeholder="correo@ejemplo.com"
+                       autocomplete="email"
+                       required />
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Contraseña
+                </label>
+
+                <input name="password"
+                       type="password"
+                       class="form-control input-premium"
+                       placeholder="********"
+                       autocomplete="current-password"
+                       required />
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-gold w-100">
+
+                Ingresar
+
+            </button>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-4 text-center">
+                    @ViewBag.Error
+                </div>
+            }
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+    body {
+        background: #0d0d0d;
+    }
+
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 500px;
+        background: rgba(18,18,18,.97);
+        border: 1px solid rgba(200,169,107,.15);
+        border-radius: 28px;
+        padding: 40px;
+        box-shadow: 0 25px 50px rgba(0,0,0,.45);
+    }
+
+    .logo-login {
+        display: block;
+        width: 180px;
+        max-width: 100%;
+        margin: 0 auto 20px auto;
+        filter: drop-shadow(0 0 20px rgba(200,169,107,.25));
+    }
+
+    .titulo-premium {
+        color: #C8A96B;
+        font-family: 'Cinzel', serif;
+        font-size: 2.6rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .subtitulo-premium {
+        color: rgba(255,255,255,.75);
+        font-size: 1.05rem;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .form-label {
+        color: rgba(255,255,255,.85);
+        margin-bottom: 8px;
+    }
+
+    .input-premium {
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(200,169,107,.15);
+        color: white !important;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+        .input-premium:focus {
+            background: rgba(255,255,255,.06);
+            border-color: #C8A96B;
+            box-shadow: 0 0 0 .2rem rgba(200,169,107,.15);
+            color: white;
+        }
+
+    .btn-gold {
+        background: linear-gradient(135deg,#C8A96B,#d4af37);
+        border: none;
+        color: black;
+        font-weight: 700;
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+        .btn-gold:hover {
+            color: black;
+            transform: translateY(-2px);
+        }
+
+    @@media(max-width:768px) {
+
+        .login-card {
+            padding: 25px;
+        }
+
+        .logo-login {
+            width: 90px;
+        }
+    }
+</style>

@@ -1,0 +1,68 @@
+@model OllinBarberApp.Models.CarritoViewModel
+@{
+    ViewData["Title"] = "Carrito";
+}
+<section class="store-shell">
+    <div class="store-hero">
+        <div>
+            <h1 class="store-title">Tu carrito</h1>
+            <p class="store-muted mb-0">@Model.CantidadTotal producto(s) seleccionado(s).</p>
+        </div>
+        <a asp-action="Index" class="btn-store-outline">Seguir comprando</a>
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="empty-store">
+            <h2 class="h4 text-warning">Tu carrito está vacío</h2>
+            <p class="store-muted">Agrega productos para continuar con tu compra.</p>
+            <a asp-action="Index" class="btn-store">Ver catálogo</a>
+        </div>
+    }
+    else
+    {
+        <div class="cart-card">
+            <form asp-action="Actualizar" method="post">
+                @foreach (var item in Model.Items)
+                {
+                    var imagen = string.IsNullOrWhiteSpace(item.Producto.ImagenUrl) ? "/images/logo.png" : item.Producto.ImagenUrl;
+                    <div class="cart-row">
+                        <img class="cart-thumb" src="@imagen" alt="@item.Producto.Nombre" />
+                        <div>
+                            <strong>@item.Producto.Nombre</strong>
+                            <div class="store-muted small">@item.Producto.Categoria · @item.Producto.Marca</div>
+                            <div class="small stock-ok">Stock: @item.Producto.Stock</div>
+                        </div>
+                        <div class="cart-qty">
+                            <label class="form-label small" for="qty-@item.Producto.Id">Cantidad</label>
+                            <input id="qty-@item.Producto.Id" class="form-control" type="number" min="0" max="@item.Producto.Stock" name="cantidades[@item.Producto.Id]" value="@item.Cantidad" />
+                        </div>
+                        <div class="cart-price">
+                            <strong>@item.Subtotal.ToString("C0")</strong>
+                            @if (item.Ahorro > 0)
+                            {
+                                <div class="small text-success">Ahorras @item.Ahorro.ToString("C0")</div>
+                            }
+                        </div>
+                        <div class="cart-actions">
+                            <button class="btn btn-sm btn-outline-warning" type="submit" asp-action="Eliminar" asp-route-productoId="@item.Producto.Id" formmethod="post">Eliminar</button>
+                        </div>
+                    </div>
+                }
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn-store-outline">Actualizar carrito</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="cart-card cart-summary mt-3">
+            <div class="summary-line"><span>Subtotal</span><strong>@Model.Subtotal.ToString("C0")</strong></div>
+            <div class="summary-line"><span>Descuentos</span><strong class="text-success">-@Model.DescuentoTotal.ToString("C0")</strong></div>
+            <div class="summary-line summary-total"><span>Total</span><span>@Model.Total.ToString("C0")</span></div>
+            <a asp-action="Checkout" class="btn-store d-block text-center text-decoration-none mt-3">Continuar al checkout</a>
+            <form asp-action="Vaciar" method="post" class="mt-2">
+                <button type="submit" class="btn btn-link text-danger w-100">Vaciar carrito</button>
+            </form>
+        </div>
+    }
+</section>

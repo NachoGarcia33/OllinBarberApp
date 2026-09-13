@@ -1,0 +1,5 @@
+@model OllinBarberApp.Models.Cita
+@{ ViewData["Title"] = "Cita confirmada"; }
+<section class="store-shell" style="max-width:700px">
+    <div class="order-card text-center"><div class="display-6 text-success mb-2">✓</div><h1 class="store-title h2">Cita confirmada</h1><p class="store-muted">La reserva quedó marcada como confirmada.</p><div class="mt-3"><strong>@Model.ClienteNombre</strong><div>@Model.Servicio?.Nombre</div><div class="text-warning">@Model.FechaHora.ToOffset(TimeSpan.FromHours(-5)).ToString("dd/MM/yyyy · hh:mm tt")</div><div>@(Model.BarberoEntidad?.Nombre ?? Model.Barbero)</div></div><a asp-action="Agenda" asp-route-fecha="@Model.FechaHora.ToOffset(TimeSpan.FromHours(-5)).ToString("yyyy-MM-dd")" class="btn-store-outline d-inline-block mt-4">Ver agenda</a></div>
+</section>

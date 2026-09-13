@@ -1,0 +1,29 @@
+@model List<OllinBarberApp.Models.Producto>
+@{ ViewData["Title"] = "Productos"; }
+<section class="container py-4">
+    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3"><div><h1 class="m-0" style="color:#d4af37;">Productos de tienda</h1><div class="text-white-50">Precio, descuento, stock e información de catálogo.</div></div><a asp-action="CrearProducto" class="btn btn-warning fw-bold">Agregar producto</a></div>
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead><tr><th>Producto</th><th>Marca / categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.Nombre</strong><div class="text-white-50 small">@item.Descripcion</div></td>
+                    <td>@item.Marca<div class="text-white-50 small">@item.Categoria</div></td>
+                    <td>@if(item.DescuentoPorcentaje>0){<span class="text-decoration-line-through text-white-50 me-2">@item.Precio.ToString("C0")</span>}<strong class="text-warning">@item.PrecioFinal.ToString("C0")</strong>@if(item.DescuentoPorcentaje>0){<div class="small text-success">-@item.DescuentoPorcentaje.ToString("0")%</div>}</td>
+                    <td class="@(item.Stock == 0 ? "text-danger" : "")">@item.Stock</td>
+                    <td>@(item.Activo ? "Activo" : "Inactivo")</td>
+                    <td><div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="EditarProducto" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Editar</a>
+                        <form asp-action="@(item.Activo ? "EliminarProducto" : "ActivarProducto")" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm @(item.Activo ? "btn-outline-danger" : "btn-outline-success")">@(item.Activo ? "Desactivar" : "Activar")</button>
+                        </form>
+                    </div></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

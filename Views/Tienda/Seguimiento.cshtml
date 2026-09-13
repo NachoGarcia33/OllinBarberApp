@@ -1,0 +1,46 @@
+@model OllinBarberApp.Models.SeguimientoPedidoViewModel
+@using OllinBarberApp.Models
+@{
+    ViewData["Title"] = "Seguimiento de pedido";
+    var ordenEstados = new[] { EstadoPedido.Pendiente, EstadoPedido.Confirmado, EstadoPedido.Procesando, EstadoPedido.Enviado, EstadoPedido.Entregado };
+}
+<section class="store-shell" style="max-width:820px">
+    <div class="store-hero"><div><h1 class="store-title">Seguimiento de pedido</h1><p class="store-muted mb-0">Consulta usando el código y celular registrados.</p></div><a asp-action="Index" class="btn-store-outline">Tienda</a></div>
+    <form asp-action="Seguimiento" method="post" class="checkout-card mb-3">
+        <div asp-validation-summary="ModelOnly" class="mb-2"></div>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5"><label asp-for="Codigo" class="form-label">Código</label><input asp-for="Codigo" class="form-control text-uppercase" placeholder="OB-..." /><span asp-validation-for="Codigo"></span></div>
+            <div class="col-md-5"><label asp-for="Telefono" class="form-label">Celular</label><input asp-for="Telefono" class="form-control" inputmode="numeric" /><span asp-validation-for="Telefono"></span></div>
+            <div class="col-md-2"><button class="btn-store w-100" type="submit">Buscar</button></div>
+        </div>
+    </form>
+    @if (Model.Pedido != null)
+    {
+        var pedido = Model.Pedido;
+        var indice = Array.IndexOf(ordenEstados, pedido.Estado);
+        <div class="order-card">
+            <div class="d-flex justify-content-between gap-2 flex-wrap"><div><div class="store-muted small">Pedido</div><h2 class="h4 text-warning">@pedido.Codigo</h2></div><span class="order-status">@pedido.Estado</span></div>
+            @if (pedido.Estado == EstadoPedido.Cancelado)
+            {
+                <div class="alert alert-danger">Este pedido fue cancelado.</div>
+            }
+            else
+            {
+                <div class="timeline" aria-label="Progreso del pedido">
+                    @for (var i = 0; i < ordenEstados.Length; i++)
+                    {
+                        <div class="timeline-step @(i <= indice ? "done" : "")" title="@ordenEstados[i]"></div>
+                    }
+                </div>
+                <div class="small store-muted">Pendiente → Confirmado → Procesando → Enviado → Entregado</div>
+            }
+            <hr class="border-secondary" />
+            @foreach (var item in pedido.Detalles)
+            {
+                <div class="summary-line"><span>@item.Cantidad × @(item.Producto?.Nombre ?? $"Producto #{item.ProductoId}")</span><strong>@item.Subtotal.ToString("C0")</strong></div>
+            }
+            <div class="summary-line summary-total"><span>Total</span><span>@pedido.Total.ToString("C0")</span></div>
+        </div>
+    }
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

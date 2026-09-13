@@ -1,0 +1,43 @@
+@model List<OllinBarberApp.Models.ClienteAdminViewModel>
+@{ ViewData["Title"] = "Clientes"; var co = TimeSpan.FromHours(-5); }
+<section class="container py-4">
+    <div class="mb-3">
+        <h1 class="m-0" style="color:#d4af37;">Clientes</h1>
+        <p class="text-white-50 mb-0">Cuentas registradas y compradores invitados consolidados por correo o celular.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-dark border-warning text-warning">Aún no hay clientes registrados ni pedidos.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead><tr><th>Cliente</th><th>Contacto</th><th>Tipo</th><th>Pedidos</th><th>Último pedido</th><th>Total entregado</th></tr></thead>
+                <tbody>
+                @foreach (var cliente in Model)
+                {
+                    <tr>
+                        <td><strong>@cliente.Nombre</strong></td>
+                        <td><div>@cliente.Email</div><div class="small text-white-50">@cliente.Telefono</div></td>
+                        <td>
+                            @if (cliente.TieneCuenta)
+                            {
+                                <span class="badge @(cliente.CuentaBloqueada ? "text-bg-danger" : "text-bg-success")">@(cliente.CuentaBloqueada ? "Cuenta bloqueada" : "Cuenta activa")</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">Invitado</span>
+                            }
+                        </td>
+                        <td>@cliente.CantidadPedidos</td>
+                        <td>@(cliente.UltimoPedido?.ToOffset(co).ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
+                        <td class="fw-bold">@cliente.TotalEntregado.ToString("C0")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

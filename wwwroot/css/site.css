@@ -1,0 +1,108 @@
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #0D0D0D;
+    color: #EAEAEA;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+/* =========================
+   BOTONES Y FORMULARIOS
+========================= */
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* =========================
+   TITULOS
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    color: #C9A65B;
+}
+
+/* =========================
+   TABLAS
+========================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: #1a1a1a;
+    color: #C9A65B;
+    padding: 10px;
+    text-align: left;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+tr:hover {
+    background-color: #1f1f1f;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.navbar-nav {
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+/* =========================
+   CONTENEDORES
+========================= */
+
+.container,
+.container-fluid {
+    max-width: 100%;
+}
+
+/* =========================
+   IMAGENES
+========================= */
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
