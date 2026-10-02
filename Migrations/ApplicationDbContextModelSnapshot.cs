@@ -316,6 +316,76 @@ namespace OllinBarberApp.Migrations
                     b.ToTable("Citas");
                 });
 
+            modelBuilder.Entity("OllinBarberApp.Models.Notificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CitaId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Leida")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CitaId");
+
+                    b.HasIndex("BarberoId", "Leida");
+
+                    b.ToTable("Notificaciones");
+                });
+
+            modelBuilder.Entity("OllinBarberApp.Models.SuscripcionPush", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("BarberoId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberoId");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.ToTable("SuscripcionesPush");
+                });
+
             modelBuilder.Entity("OllinBarberApp.Models.ConfiguracionSistema", b =>
                 {
                     b.Property<int>("Id")
@@ -701,6 +771,35 @@ namespace OllinBarberApp.Migrations
                     b.Navigation("Producto");
 
                     b.Navigation("Venta");
+                });
+
+            modelBuilder.Entity("OllinBarberApp.Models.Notificacion", b =>
+                {
+                    b.HasOne("OllinBarberApp.Models.Barbero", "Barbero")
+                        .WithMany()
+                        .HasForeignKey("BarberoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OllinBarberApp.Models.Cita", "Cita")
+                        .WithMany()
+                        .HasForeignKey("CitaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Barbero");
+
+                    b.Navigation("Cita");
+                });
+
+            modelBuilder.Entity("OllinBarberApp.Models.SuscripcionPush", b =>
+                {
+                    b.HasOne("OllinBarberApp.Models.Barbero", "Barbero")
+                        .WithMany()
+                        .HasForeignKey("BarberoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Barbero");
                 });
 
             modelBuilder.Entity("OllinBarberApp.Models.Barbero", b =>

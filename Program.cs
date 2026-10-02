@@ -65,6 +65,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
+
+builder.Services.AddScoped<OllinBarberApp.Services.WebPushSender>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

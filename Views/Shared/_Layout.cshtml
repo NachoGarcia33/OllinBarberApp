@@ -364,6 +364,23 @@
                         <li class="nav-item"><a class="nav-link" href="/Tienda/Carrito">Carrito</a></li>
                     }
 
+                    @if (User.IsInRole("Barbero"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle position-relative" href="#" role="button" data-bs-toggle="dropdown" id="campana-notificaciones">
+                                🔔
+                                <span id="badge-notificaciones" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display:none;">0</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="lista-notificaciones" style="min-width: 320px; max-height: 400px; overflow-y:auto;">
+                                <li><span class="dropdown-item-text text-muted">Sin novedades por ahora</span></li>
+                            </ul>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="/Notificaciones">Ver todas</a></li>
+                                <li><a class="dropdown-item" href="#" id="btn-activar-push">Activar notificaciones en este celular</a></li>
+                            </ul>
+                        </li>
+                    }
+
                     @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item dropdown">
@@ -529,6 +546,99 @@
     </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @if (User.IsInRole("Barbero"))
+    {
+        <form id="form-token-notificaciones" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+
+        <script>
+            (function () {
+                const token = document.querySelector('#form-token-notificaciones input[name="__RequestVerificationToken"]')?.value || '';
+                const badge = document.getElementById('badge-notificaciones');
+                const lista = document.getElementById('lista-notificaciones');
+
+                async function cargarNotificaciones() {
+                    try {
+                        const res = await fetch('/Notificaciones/Resumen');
+                        if (!res.ok) return;
+                        const data = await res.json();
+
+                        if (data.noLeidas > 0) {
+                            badge.style.display = 'inline-block';
+                            badge.textContent = data.noLeidas > 9 ? '9+' : data.noLeidas;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+
+                        lista.innerHTML = '';
+                        if (!data.items.length) {
+                            lista.innerHTML = '<li><span class="dropdown-item-text text-muted">Sin novedades por ahora</span></li>';
+                            return;
+                        }
+
+                        data.items.forEach(function (n) {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<a class="dropdown-item ${n.leida ? '' : 'fw-bold'}" href="#" data-id="${n.id}">
+                                ${n.mensaje}<br><small class="text-muted">${n.fecha}</small>
+                            </a>`;
+                            li.querySelector('a').addEventListener('click', async function (e) {
+                                e.preventDefault();
+                                await fetch('/Notificaciones/MarcarLeida?id=' + n.id, {
+                                    method: 'POST',
+                                    headers: { 'RequestVerificationToken': token }
+                                });
+                                cargarNotificaciones();
+                            });
+                            lista.appendChild(li);
+                        });
+                    } catch (e) { /* silencioso: si falla, se reintenta en el próximo ciclo */ }
+                }
+
+                cargarNotificaciones();
+                setInterval(cargarNotificaciones, 20000);
+
+                function urlBase64ToUint8Array(base64String) {
+                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                    const rawData = atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+                    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+                    return outputArray;
+                }
+
+                async function activarPush() {
+                    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                        alert('Este navegador no soporta notificaciones. Prueba con Chrome actualizado.');
+                        return;
+                    }
+                    const permiso = await Notification.requestPermission();
+                    if (permiso !== 'granted') {
+                        alert('No se activaron las notificaciones. Puedes intentarlo de nuevo cuando quieras.');
+                        return;
+                    }
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    const publicKey = await (await fetch('/Push/PublicKey')).text();
+                    const subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                    });
+                    await fetch('/Push/Suscribir', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                        body: JSON.stringify(subscription)
+                    });
+                    alert('¡Listo! Este celular ya recibirá notificaciones de nuevas citas.');
+                }
+
+                document.getElementById('btn-activar-push')?.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    activarPush();
+                });
+            })();
+        </script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 

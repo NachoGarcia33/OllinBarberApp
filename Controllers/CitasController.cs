@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OllinBarberApp.Data;
 using OllinBarberApp.Models;
+using OllinBarberApp.Services;
 
 namespace OllinBarberApp.Controllers
 {
@@ -13,7 +14,13 @@ namespace OllinBarberApp.Controllers
         private static readonly TimeSpan ColombiaOffset = TimeSpan.FromHours(-5);
         private readonly ApplicationDbContext _context;
 
-        public CitasController(ApplicationDbContext context) => _context = context;
+        private readonly WebPushSender _pushSender;
+
+        public CitasController(ApplicationDbContext context, WebPushSender pushSender)
+        {
+            _context = context;
+            _pushSender = pushSender;
+        }
 
         [AllowAnonymous]
         [HttpGet]
@@ -97,12 +104,27 @@ namespace OllinBarberApp.Controllers
                 cita.TokenConfirmacion = Guid.NewGuid().ToString("N");
 
                 _context.Citas.Add(cita);
+
+                var notificacion = new Notificacion
+                {
+                    BarberoId = barbero.Id,
+                    Cita = cita,
+                    Mensaje = $"Nueva cita: {cita.ClienteNombre} el {cita.FechaHora:dd/MM/yyyy} a las {cita.FechaHora:hh:mm tt}",
+                };
+                _context.Notificaciones.Add(notificacion);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 await _context.Entry(cita).Reference(c => c.Servicio).LoadAsync();
                 await _context.Entry(cita).Reference(c => c.BarberoEntidad).LoadAsync();
                 PrepararConfirmacionWhatsApp(cita, servicio!, barbero);
+
+                await _pushSender.EnviarATodasLasSuscripcionesAsync(
+                    barbero.Id,
+                    "Nueva cita agendada",
+                    $"{cita.ClienteNombre} el {cita.FechaHora:dd/MM/yyyy} a las {cita.FechaHora:hh:mm tt}");
+
                 ViewBag.WhatsAppUrl = TempData["WhatsAppUrl"]?.ToString();
                 return View("ReservaExitosa", cita);
             }

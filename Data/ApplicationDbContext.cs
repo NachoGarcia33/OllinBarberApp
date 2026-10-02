@@ -20,6 +20,8 @@ namespace OllinBarberApp.Data
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<PedidoDetalle> PedidoDetalles { get; set; }
         public DbSet<ConfiguracionSistema> ConfiguracionSistema { get; set; }
+        public DbSet<Notificacion> Notificaciones { get; set; }
+        public DbSet<SuscripcionPush> SuscripcionesPush { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +66,37 @@ namespace OllinBarberApp.Data
                 .HasForeignKey(v => v.ProductoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+            modelBuilder.Entity<Notificacion>()
+                .HasOne(n => n.Barbero)
+                .WithMany()
+                .HasForeignKey(n => n.BarberoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notificacion>()
+                .HasOne(n => n.Cita)
+                .WithMany()
+                .HasForeignKey(n => n.CitaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notificacion>()
+                .HasIndex(n => new { n.BarberoId, n.Leida });
+
+            modelBuilder.Entity<Notificacion>().Property(n => n.Mensaje).HasColumnType("text");
+
+            modelBuilder.Entity<SuscripcionPush>()
+                .HasOne(s => s.Barbero)
+                .WithMany()
+                .HasForeignKey(s => s.BarberoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SuscripcionPush>()
+                .HasIndex(s => s.Endpoint)
+                .IsUnique();
+
+            modelBuilder.Entity<SuscripcionPush>().Property(s => s.Endpoint).HasColumnType("text");
+            modelBuilder.Entity<SuscripcionPush>().Property(s => s.P256dh).HasColumnType("text");
+            modelBuilder.Entity<SuscripcionPush>().Property(s => s.Auth).HasColumnType("text");
 
             modelBuilder.Entity<Barbero>().Property(b => b.Nombre).HasColumnType("text");
             modelBuilder.Entity<Barbero>().Property(b => b.ImagenUrl).HasColumnType("text");

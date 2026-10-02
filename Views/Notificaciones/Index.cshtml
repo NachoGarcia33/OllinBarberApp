@@ -1,0 +1,47 @@
+@model List<OllinBarberApp.Models.Notificacion>
+
+@{
+    ViewData["Title"] = "Mis notificaciones";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Mis notificaciones</h2>
+        <button id="btn-marcar-todas" class="btn btn-outline-warning btn-sm">Marcar todas como leídas</button>
+    </div>
+
+    <form id="form-token-notificaciones-index" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Todavía no tienes notificaciones.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var n in Model)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-start @(n.Leida ? "" : "list-group-item-warning")">
+                    <div>
+                        <div>@n.Mensaje</div>
+                        <small class="text-muted">@n.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt")</small>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<script>
+    document.getElementById('btn-marcar-todas')?.addEventListener('click', async function () {
+        const token = document.querySelector('#form-token-notificaciones-index input[name="__RequestVerificationToken"]')?.value || '';
+        await fetch('/Notificaciones/MarcarTodasLeidas', {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': token }
+        });
+        location.reload();
+    });
+</script>
